@@ -1,65 +1,133 @@
-import Image from "next/image";
+'use client';
+
+import { useApp } from '@/lib/app-context';
+import Landing from '@/components/Landing';
+import StudentLogin from '@/components/StudentLogin';
+import StudentDashboard from '@/components/StudentDashboard';
+import ParentLogin from '@/components/ParentLogin';
+import ParentDashboard from '@/components/ParentDashboard';
+import EducatorLogin from '@/components/EducatorLogin';
+import EducatorDashboard from '@/components/EducatorDashboard';
+import Quiz from '@/components/Quiz';
+import Tutor from '@/components/Tutor';
+import ReviewMode from '@/components/ReviewMode';
+import DocUpload from '@/components/DocUpload';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  const { user, login, logout } = useApp();
+  const [screen, setScreen] = useState('landing');
+  const [restored, setRestored] = useState(false);
+
+  // Auto-restore session on mount
+  useEffect(() => {
+    if (!restored && user) {
+      if (user.role === 'student') setScreen('dashboard');
+      else if (user.role === 'parent') setScreen('par-dash');
+      else if (user.role === 'educator') setScreen('edu-dash');
+      setRestored(true);
+    }
+  }, [user, restored]);
+
+  // Landing
+  if (screen === 'landing') {
+    return (
+      <Landing
+        onStudent={() => setScreen('stu-login')}
+        onParent={() => setScreen('par-login')}
+        onEducator={() => setScreen('edu-login')}
+      />
+    );
+  }
+
+  // Auth screens
+  if (screen === 'stu-login') {
+    return (
+      <StudentLogin
+        onSelect={(student) => {
+          login({ ...student, role: 'student' });
+          setScreen('dashboard');
+        }}
+        onBack={() => setScreen('landing')}
+      />
+    );
+  }
+
+  if (screen === 'par-login') {
+    return (
+      <ParentLogin
+        onSuccess={() => {
+          login({ id: 'parent', name: 'Parent', grade: '', state: '', created: '', role: 'parent' });
+          setScreen('par-dash');
+        }}
+        onBack={() => setScreen('landing')}
+      />
+    );
+  }
+
+  if (screen === 'edu-login') {
+    return (
+      <EducatorLogin
+        onSuccess={() => {
+          login({ id: 'educator', name: 'Educator', grade: '', state: '', created: '', role: 'educator' });
+          setScreen('edu-dash');
+        }}
+        onBack={() => setScreen('landing')}
+      />
+    );
+  }
+
+  // Student screens
+  if (screen === 'dashboard' && user?.role === 'student') {
+    return (
+      <StudentDashboard
+        onQuiz={(subject) => setScreen('quiz-' + subject)}
+        onTutor={(subject) => setScreen('tutor-' + subject)}
+        onReview={() => setScreen('review')}
+        onUpload={() => setScreen('upload')}
+        onLogout={() => { logout(); setScreen('landing'); }}
+      />
+    );
+  }
+
+  const quizMatch = screen.match(/^quiz-(.+)$/);
+  if (quizMatch && user?.role === 'student') {
+    return (
+      <Quiz
+        subject={quizMatch[1]}
+        onDone={() => setScreen('dashboard')}
+        onBack={() => setScreen('dashboard')}
+      />
+    );
+  }
+
+  const tutorMatch = screen.match(/^tutor-(.+)$/);
+  if (tutorMatch && user?.role === 'student') {
+    return (
+      <Tutor
+        subject={tutorMatch[1]}
+        onBack={() => setScreen('dashboard')}
+      />
+    );
+  }
+
+  if (screen === 'review' && user?.role === 'student') {
+    return <ReviewMode onBack={() => setScreen('dashboard')} />;
+  }
+
+  if (screen === 'upload' && user?.role === 'student') {
+    return <DocUpload onBack={() => setScreen('dashboard')} />;
+  }
+
+  // Parent dashboard
+  if (screen === 'par-dash') {
+    return <ParentDashboard onLogout={() => { logout(); setScreen('landing'); }} />;
+  }
+
+  // Educator dashboard
+  if (screen === 'edu-dash') {
+    return <EducatorDashboard onLogout={() => { logout(); setScreen('landing'); }} />;
+  }
+
+  return null;
 }
