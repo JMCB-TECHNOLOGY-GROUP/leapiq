@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          ANTHROPIC_API_KEY: placeholder
+
+      - name: Test
+        run: npm test -- --run
+        if: hashFiles('vitest.config.*') != ''
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for hardcoded secrets
+        run: |
+          PATTERNS='sk-ant-|sk_live_|sk_test_|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36}|password\s*=\s*["\x27][^"\x27]+'
+          FOUND=$(grep -rn --include="*.ts" --include="*.tsx" --include="*.js" -E "$PATTERNS" src/ || true)
+          if [ -n "$FOUND" ]; then
+            echo "::error::Potential secrets found in source code"
+            echo "$FOUND"
+            exit 1
+          fi
+
+      - name: Check for PII logging
+        run: |
+          PII_PATTERNS='console\.(log|info|debug).*\b(token|secret|password|api_key|access_token|refresh_token)\b'
+          FOUND=$(grep -rn --include="*.ts" --include="*.tsx" -iE "$PII_PATTERNS" src/ || true)
+          if [ -n "$FOUND" ]; then
+            echo "::error::Potential PII/token logging detected"
+            echo "$FOUND"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - name: Dependency audit
+        run: npm audit --audit-level=high || echo "::warning::Vulnerabilities found - review required"
