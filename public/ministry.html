@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ministry Learning Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Public+Sans:wght@300..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#EFF3ED; --surface:#FBFCFA; --surface-2:#E7EDE5; --raised:#FFFFFF;
+  --rule:#CDD7C9; --rule-soft:#E1E8DD;
+  --ink:#141F19; --ink-2:#334237; --muted:#67786C;
+  --accent:#00805F;
+  --coast:#2F7FBF; --hinter:#AD7C12;
+  --good:#1F7A4D; --warn:#9A5E05; --crit:#A3372B;
+  --good-bg:#E2F0E8; --warn-bg:#F7EEDC; --crit-bg:#F7E4E1;
+  --chip:#E2ECE5;
+  /* Sequential mastery ramp, light -> dark */
+  --m1:#E9F2EC; --m2:#C6E0D3; --m3:#99C9B4; --m4:#63AF93; --m5:#2E9174; --m6:#00775C;
+  --m1t:#1B3327; --m2t:#153126; --m3t:#0F2C21; --m4t:#F6FBF8; --m5t:#F6FBF8; --m6t:#F6FBF8;
+  --shadow:0 1px 2px rgba(20,31,25,.05), 0 8px 22px -14px rgba(20,31,25,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#0B120F; --surface:#131C18; --surface-2:#18231D; --raised:#18231D;
+    --rule:#27352C; --rule-soft:#1D2922;
+    --ink:#E7EDE8; --ink-2:#C1CEC4; --muted:#8A9B8F;
+    --accent:#4FB79A;
+    --coast:#3B8ACB; --hinter:#B8891F;
+    --good:#5FCB8E; --warn:#E0A54A; --crit:#E4776A;
+    --good-bg:#12301F; --warn-bg:#33260C; --crit-bg:#351714;
+    --chip:#1C2A22;
+    --m1:#16241D; --m2:#173A2E; --m3:#1A4E3C; --m4:#1C654D; --m5:#1B7E60; --m6:#199873;
+    --m1t:#9DB2A5; --m2t:#C0D3C7; --m3t:#DCE9E1; --m4t:#EAF3EE; --m5t:#F1F8F4; --m6t:#F4FBF7;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#0B120F; --surface:#131C18; --surface-2:#18231D; --raised:#18231D;
+  --rule:#27352C; --rule-soft:#1D2922;
+  --ink:#E7EDE8; --ink-2:#C1CEC4; --muted:#8A9B8F;
+  --accent:#4FB79A;
+  --coast:#3B8ACB; --hinter:#B8891F;
+  --good:#5FCB8E; --warn:#E0A54A; --crit:#E4776A;
+  --good-bg:#12301F; --warn-bg:#33260C; --crit-bg:#351714;
+  --chip:#1C2A22;
+  --m1:#16241D; --m2:#173A2E; --m3:#1A4E3C; --m4:#1C654D; --m5:#1B7E60; --m6:#199873;
+  --m1t:#9DB2A5; --m2t:#C0D3C7; --m3t:#DCE9E1; --m4t:#EAF3EE; --m5t:#F1F8F4; --m6t:#F4FBF7;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:14.5px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:3px}
+button{font:inherit; color:inherit; cursor:pointer}
+
+.wrap{max-width:1200px; margin:0 auto; padding:0 22px 80px}
+
+/* ── masthead ── */
+.top{padding:26px 0 0}
+.brandline{display:flex; align-items:baseline; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.kicker{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10.5px;
+  letter-spacing:.17em; text-transform:uppercase; color:var(--accent); font-weight:600;
+}
+h1{
+  font-family:"Newsreader", Georgia, serif; font-weight:500;
+  font-size:clamp(28px,4vw,40px); line-height:1.06; letter-spacing:-.015em;
+  margin:10px 0 6px; text-wrap:balance;
+}
+.sub{color:var(--ink-2); max-width:66ch; margin:0 0 18px; font-size:16px}
+.asof{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+  color:var(--muted); white-space:nowrap;
+}
+.demo{
+  display:flex; gap:10px; align-items:flex-start;
+  background:var(--warn-bg); border:1px solid var(--rule);
+  border-left:3px solid var(--warn);
+  padding:11px 15px; font-size:13px; color:var(--ink-2); margin:0 0 22px;
+}
+.demo b{color:var(--ink)}
+
+/* ── filter bar ── */
+.filters{
+  display:flex; gap:14px 22px; align-items:center; flex-wrap:wrap;
+  border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+  padding:12px 0; margin-bottom:26px;
+}
+.fgroup{display:flex; align-items:center; gap:9px}
+.flabel{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600;
+}
+.seg{display:flex; border:1px solid var(--rule); background:var(--surface)}
+.seg button{
+  border:0; background:none; padding:6px 13px; font-size:13px; font-weight:600;
+  color:var(--muted); border-right:1px solid var(--rule);
+}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent); color:#fff}
+select{
+  font:inherit; font-size:13.5px; padding:6px 10px; background:var(--surface);
+  color:var(--ink); border:1px solid var(--rule); border-radius:0;
+}
+.fscope{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+  color:var(--muted); margin-left:auto; white-space:nowrap;
+}
+.fscope b{color:var(--ink-2); font-weight:600}
+
+/* ── panels ── */
+section{margin-bottom:30px}
+.shead{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:12px; flex-wrap:wrap}
+.sheadl{display:flex; align-items:baseline; gap:11px; flex-wrap:wrap}
+h2{
+  font-family:"Newsreader", Georgia, serif; font-weight:500;
+  font-size:23px; line-height:1.2; margin:0; letter-spacing:-.01em;
+}
+.shead p{margin:0; font-size:13px; color:var(--muted); max-width:62ch}
+.panel{background:var(--surface); border:1px solid var(--rule); padding:18px 20px}
+/* Marks a panel the filter bar deliberately does not drive, so its stillness reads
+   as a property of the data rather than as a broken control. */
+.natflag{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:9.5px;
+  letter-spacing:.12em; text-transform:uppercase; font-weight:600;
+  color:var(--muted); background:var(--chip); border:1px solid var(--rule);
+  padding:2px 7px; white-space:nowrap;
+}
+
+/* ── KPI tiles ── */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule)}
+.kpi{background:var(--surface); padding:16px 18px 14px; display:flex; flex-direction:column; gap:2px; min-height:132px}
+.kpi .k{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10px;
+  letter-spacing:.13em; text-transform:uppercase; color:var(--muted); font-weight:600;
+}
+.kpi .v{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:34px; font-weight:600;
+  letter-spacing:-.025em; line-height:1.05; font-variant-numeric:tabular-nums; margin-top:8px;
+}
+.kpi .v small{font-size:17px; color:var(--muted); font-weight:500}
+.kpi .d{display:flex; align-items:center; gap:7px; margin-top:auto; padding-top:10px; font-size:12.5px}
+.kpi .note{font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.35}
+.delta{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-weight:600; font-size:12px;
+  padding:2px 7px; white-space:nowrap;
+}
+.delta.up{background:var(--good-bg); color:var(--good)}
+.delta.down{background:var(--crit-bg); color:var(--crit)}
+.delta.flat{background:var(--chip); color:var(--muted)}
+.kpi .d span{color:var(--muted)}
+
+/* ── charts ── */
+.chartbox{position:relative; overflow-x:auto}
+svg{display:block; max-width:100%}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:12px}
+.legend span{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-2)}
+.legend i{width:14px; height:3px; display:block; flex:none; border-radius:2px}
+.tip{
+  position:absolute; pointer-events:none; opacity:0; transform:translate(-50%,-118%);
+  background:var(--ink); color:var(--paper); padding:8px 11px; border-radius:3px;
+  font-size:12px; line-height:1.5; white-space:nowrap; z-index:9;
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+  transition:opacity .09s;
+}
+.tip b{font-family:"Public Sans",sans-serif; font-weight:600; font-size:12.5px}
+
+/* ── tables ── */
+.tablewrap{overflow-x:auto; border:1px solid var(--rule); background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:720px}
+th,td{padding:9px 14px; text-align:left; border-bottom:1px solid var(--rule-soft)}
+thead th{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
+  font-weight:600; background:var(--surface-2); border-bottom:1px solid var(--rule); white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.hint{background:var(--warn-bg)}
+td.num,th.num{text-align:right; font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+.bar{display:flex; align-items:center; gap:9px; min-width:132px}
+.bar .track{flex:1; height:6px; background:var(--surface-2); position:relative; overflow:hidden}
+.bar .track i{position:absolute; inset:0 auto 0 0; display:block; background:var(--accent)}
+.bar .track u{position:absolute; top:-2px; bottom:-2px; width:1px; background:var(--ink); opacity:.45}
+.pill{
+  display:inline-block; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:10.5px;
+  font-weight:600; letter-spacing:.05em; text-transform:uppercase; padding:2px 7px; white-space:nowrap;
+}
+.pill.good{background:var(--good-bg); color:var(--good)}
+.pill.warn{background:var(--warn-bg); color:var(--warn)}
+.pill.crit{background:var(--crit-bg); color:var(--crit)}
+
+/* ── heatmap ── */
+.heat{display:grid; gap:14px 26px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.hsub h3{font-size:13px; font-weight:700; margin:0 0 8px; display:flex; align-items:center; gap:8px}
+.hrow{display:grid; grid-template-columns:1fr 46px; gap:8px; align-items:center; margin-bottom:3px}
+.hrow .n{font-size:12.5px; color:var(--ink-2)}
+.cell{
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px; font-weight:600;
+  text-align:center; padding:5px 0; font-variant-numeric:tabular-nums;
+}
+.cell[data-l="1"]{background:var(--m1); color:var(--m1t)}
+.cell[data-l="2"]{background:var(--m2); color:var(--m2t)}
+.cell[data-l="3"]{background:var(--m3); color:var(--m3t)}
+.cell[data-l="4"]{background:var(--m4); color:var(--m4t)}
+.cell[data-l="5"]{background:var(--m5); color:var(--m5t)}
+.cell[data-l="6"]{background:var(--m6); color:var(--m6t)}
+.ramp{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--muted); margin-top:14px; flex-wrap:wrap}
+.ramp .sw{display:flex}
+.ramp .sw i{width:26px; height:11px; display:block}
+
+/* ── journey ── */
+.jtrack{position:relative; overflow-x:auto; padding-bottom:4px}
+.jdetail{
+  display:grid; grid-template-columns:1fr; gap:16px; margin-top:16px;
+  border-top:1px solid var(--rule); padding-top:16px;
+}
+@media(min-width:820px){ .jdetail{grid-template-columns:1.15fr 1fr} }
+.jd h3{margin:0 0 3px; font-size:19px; font-family:"Newsreader",Georgia,serif; font-weight:500}
+.jd .when{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px; color:var(--muted); margin-bottom:10px}
+.jd p{margin:0 0 12px; font-size:14px; color:var(--ink-2)}
+.jstats{display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule)}
+.jstat{background:var(--raised); padding:11px 13px}
+.jstat .k{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600}
+.jstat .v{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:19px; font-weight:600; margin-top:4px; font-variant-numeric:tabular-nums}
+.mods{margin:0; padding:0; list-style:none}
+.mods li{
+  display:flex; gap:9px; align-items:baseline; padding:6px 0;
+  border-bottom:1px solid var(--rule-soft); font-size:13px;
+}
+.mods li:last-child{border-bottom:0}
+.mods .tick{color:var(--good); font-weight:700; flex:none; width:14px}
+.mods .tick.pend{color:var(--muted)}
+.mods .yr{
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:10.5px; color:var(--muted);
+  margin-left:auto; flex:none;
+}
+
+/* ── the arithmetic of the gap ── */
+.gapgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule)}
+.gstat{background:var(--surface); padding:16px 18px}
+.gstat .v{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:31px; font-weight:600;
+  letter-spacing:-.025em; line-height:1; font-variant-numeric:tabular-nums}
+.gstat .v small{font-size:15px; color:var(--muted); font-weight:500; letter-spacing:0}
+.gstat .l{font-size:12.5px; color:var(--muted); margin-top:8px; line-height:1.45}
+.gstat.hero .v{color:var(--crit)}
+.verdictline{background:var(--crit-bg); border:1px solid var(--rule);
+  border-left:3px solid var(--crit); padding:15px 19px; margin-top:1px;
+  font-size:15.5px; color:var(--ink); line-height:1.55}
+.chain{display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule); margin-top:18px}
+.link{background:var(--surface); display:grid; grid-template-columns:22px 1fr; gap:0 13px;
+  padding:11px 17px; align-items:baseline}
+.link .n{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:600;
+  color:var(--accent)}
+.link .t{font-size:13.5px; color:var(--ink-2)}
+.link .t b{color:var(--ink)}
+
+/* ── funnel ── */
+.funnel{display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule)}
+.frow{background:var(--surface); display:grid; grid-template-columns:170px 1fr; gap:16px; align-items:center; padding:11px 16px}
+.frow .fl{font-size:13px; font-weight:600}
+.frow .fl small{display:block; font-weight:400; color:var(--muted); font-size:11.5px; font-family:"IBM Plex Mono",monospace}
+.fbars{display:grid; gap:5px}
+.fbar{display:flex; align-items:center; gap:10px}
+.fbar .t{flex:1; height:15px; background:var(--surface-2); position:relative}
+.fbar .t i{position:absolute; inset:0 auto 0 0; display:block}
+.fbar .lab{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px; font-weight:600; width:96px; color:var(--muted); flex:none}
+.fbar .val{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px; font-weight:600; width:34px; text-align:right; flex:none; font-variant-numeric:tabular-nums}
+
+.foot{margin-top:38px; padding-top:18px; border-top:1px solid var(--rule); font-size:12.5px; color:var(--muted)}
+.foot p{margin:0 0 9px}
+.foot b{color:var(--ink-2)}
+</style>
+
+<div class="wrap">
+
+<div class="top">
+  <div class="brandline">
+    <div>
+      <div class="kicker">Ministry of Education, Guyana · LeapIQ</div>
+      <h1>National Learning Dashboard</h1>
+    </div>
+    <div class="asof">Term 1, 2026 · updated nightly</div>
+  </div>
+  <p class="sub">Every mark a pupil earns rolls up: school, education district, nation. This is the view a decision-maker uses to see which children are behind, in which strand, in which region — while there is still time to act.</p>
+
+  <div class="demo">
+    <span aria-hidden="true">⚠</span>
+    <div><b>Demonstration data.</b> Every figure on this page is illustrative, constructed to show the shape of the reporting. None of it is Ministry statistics, and no real pupil is represented. Live figures replace it once the school census and assessment feeds are connected in Phase&nbsp;0.</div>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="fgroup">
+    <span class="flabel">View</span>
+    <div class="seg" id="scopeSeg" role="group" aria-label="Scope">
+      <button type="button" data-scope="all" aria-pressed="true">National</button>
+      <button type="button" data-scope="coast" aria-pressed="false">Coastal</button>
+      <button type="button" data-scope="hinter" aria-pressed="false">Hinterland</button>
+    </div>
+  </div>
+  <div class="fgroup">
+    <label class="flabel" for="districtSel">District</label>
+    <select id="districtSel"><option value="">All eleven districts</option></select>
+  </div>
+  <div class="fgroup">
+    <span class="flabel">Stage</span>
+    <div class="seg" id="stageSeg" role="group" aria-label="Stage">
+      <button type="button" data-stage="all" aria-pressed="true">All</button>
+      <button type="button" data-stage="primary" aria-pressed="false">Primary</button>
+      <button type="button" data-stage="secondary" aria-pressed="false">Secondary</button>
+    </div>
+  </div>
+  <div class="fscope" id="fscope" aria-live="polite"></div>
+</div>
+
+<section>
+  <div class="kpis" id="kpis"></div>
+</section>
+
+<section>
+  <div class="shead">
+    <div class="sheadl">
+      <h2>The gap that matters</h2>
+      <span class="natflag">Coast vs hinterland — always both</span>
+    </div>
+    <p>Coastal against hinterland mastery, six terms. The gap is closing at roughly 1.5 points a year — the single number the Ministry should hold this programme to.</p>
+  </div>
+  <div class="panel">
+    <div class="legend">
+      <span><i style="background:var(--coast)"></i>Coastal districts</span>
+      <span><i style="background:var(--hinter)"></i>Hinterland districts (Regions 1, 7, 8, 9)</span>
+      <span><i style="background:var(--muted); height:2px; opacity:.55"></i>Expectation, 70%</span>
+    </div>
+    <div class="chartbox">
+      <div class="tip" id="tipTrend"></div>
+      <svg id="trend" viewBox="0 0 900 300" role="img" aria-label="Coastal mastery rises from 60.2 to 64.0 per cent over six terms; hinterland mastery rises from 35.4 to 42.2 per cent, narrowing the gap from 24.8 to 21.8 points."></svg>
+    </div>
+  </div>
+</section>
+
+<section id="gap-math">
+  <div class="shead">
+    <div class="sheadl">
+      <h2>What the gap costs, and what closes it</h2>
+      <span class="natflag">Arithmetic, not projection</span>
+    </div>
+    <p>Every figure here is derived from the district table below — no new assumption is introduced. It is the argument for doing anything at all.</p>
+  </div>
+  <div class="gapgrid" id="gapStats"></div>
+  <div class="verdictline" id="gapVerdict"></div>
+
+  <div class="chain">
+    <div class="link"><span class="n">01</span><span class="t"><b>A mark sheet is imported.</b> Whatever the school already has — a term test, the Grade Four Assessment — read row by row, with anything unreadable reported rather than dropped.</span></div>
+    <div class="link"><span class="n">02</span><span class="t"><b>Scores become a baseline per strand</b>, recency-weighted. Not one mark for Mathematics — a number for Number Concepts, and a different one for Geometry.</span></div>
+    <div class="link"><span class="n">03</span><span class="t"><b>Strands under expectation become goals</b>, each with a target and a criterion. Deterministic; no model decides a baseline or a goal.</span></div>
+    <div class="link"><span class="n">04</span><span class="t"><b>Goals pull modules from the grade materials</b> — including earlier years, so a Grade 6 pupil is taught at the level the evidence puts her at.</span></div>
+    <div class="link"><span class="n">05</span><span class="t"><b>Every checkpoint updates the plan</b>, and rolls up to the school, the district and this page. The gap is measured out of the same records that drive the teaching.</span></div>
+  </div>
+  <p class="foot" style="margin-top:14px;padding-top:0;border-top:0">
+    <b>What this page cannot yet tell you.</b> That chain is built and working; whether it moves the national gap faster than 1.5 points a year is not something any demonstration can show. That is the pilot's question — forty schools across four districts, measured against a matched comparison group, with a decision point at month seven.
+  </p>
+</section>
+
+<section>
+  <div class="shead">
+    <div class="sheadl">
+      <h2>Where the country stands, district by district</h2>
+    </div>
+    <p id="tableSub">Sorted weakest first. The four hinterland districts are shaded — they hold 13.7% of learners and every one of the five lowest mastery rates.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Education district</th>
+          <th class="num">Learners</th>
+          <th>Mastery vs 70% expectation</th>
+          <th class="num">Mastery</th>
+          <th class="num">Δ term</th>
+          <th class="num">Plans active</th>
+          <th class="num">Off track</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="districtRows"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead">
+    <div class="sheadl">
+      <h2>Which strands are failing, nationally</h2>
+      <span class="natflag">National only</span>
+    </div>
+    <p>Grade 6 mastery by curriculum strand. Three strands sit far enough below the rest to be a national instruction problem rather than a local one. Strand results are not yet broken out by district.</p>
+  </div>
+  <div class="panel">
+    <div class="heat" id="heat"></div>
+    <div class="ramp">
+      <span>Mastery</span>
+      <span class="sw">
+        <i style="background:var(--m1)"></i><i style="background:var(--m2)"></i><i style="background:var(--m3)"></i>
+        <i style="background:var(--m4)"></i><i style="background:var(--m5)"></i><i style="background:var(--m6)"></i>
+      </span>
+      <span>30% → 80%</span>
+      <span style="margin-left:auto">Weakest nationally: <b style="color:var(--ink)">Fractions, Decimals and Percentages 41%</b> · Working Scientifically 45% · Writing and Composition 47%</span>
+    </div>
+  </div>
+</section>
+
+<section id="learner-journey">
+  <div class="shead">
+    <div class="sheadl">
+      <h2>One child, thirteen years</h2>
+      <span class="natflag">One pupil</span>
+    </div>
+    <p><b style="color:var(--ink-2)">Anaya Persaud</b>, Region 8 — an illustrative pupil. Nursery 1 to Form 5 as a single continuous record. Select any year to see the baseline, the plan written against it, and what it changed. This is what the Ministry cannot see today.</p>
+  </div>
+  <div class="panel">
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Mastery</span>
+      <span><i style="background:var(--muted); height:2px; opacity:.55"></i>Expectation, 70%</span>
+      <span><i style="background:var(--hinter); height:11px; width:11px; border-radius:50%"></i>National assessment year</span>
+    </div>
+    <div class="jtrack">
+      <div class="tip" id="tipJ"></div>
+      <svg id="journey" viewBox="0 0 900 260" role="img" aria-label="A pupil's mastery from 38 per cent in Nursery 1 to 81 per cent at CSEC in Form 5, crossing the 70 per cent expectation line at the Grade 6 national assessment."></svg>
+    </div>
+    <div class="jdetail">
+      <div class="jd" id="jdText"></div>
+      <div>
+        <div class="jstats" id="jdStats"></div>
+        <ul class="mods" id="jdMods"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead">
+    <div class="sheadl">
+      <h2>What it changes across a cohort</h2>
+      <span class="natflag">National only</span>
+    </div>
+    <p>Of every 100 children entering Nursery 1, how many reach expectation at each national milestone. The right-hand bars are the target this programme is bought to hit — not a measured result.</p>
+  </div>
+  <div class="funnel" id="funnel"></div>
+  <div class="ramp">
+    <span class="sw"><i style="background:var(--muted); opacity:.5"></i></span><span>Today, without plans</span>
+    <span class="sw" style="margin-left:14px"><i style="background:var(--accent)"></i></span><span>Target, with plans — illustrative, established by the pilot</span>
+  </div>
+</section>
+
+<div class="foot">
+  <p><b>What feeds this.</b> School mark sheets and the Grade 2, Grade 4, Grade 9 and NGSA assessment results, imported per school; module checkpoints and practice results as pupils work. Everything aggregates from the same pupil records — nobody types a report.</p>
+  <p><b>What the filters drive.</b> The View, District and Stage controls drive the summary tiles and the district table. The trend chart is a coast-against-hinterland comparison and always shows both; the strand heatmap, the pupil journey and the cohort funnel are national figures that are not broken out by district, and are marked as such.</p>
+  <p><b>What is real and what is not.</b> The eleven education districts, the hinterland designation, the curriculum strands and the assessment structure are Guyana's own. Every number is demonstration data. Prepared by JMCB Technology Group; not a Ministry publication.</p>
+</div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function el(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!==undefined)e.textContent=t;return e;}
+  function h(n,a,t){var e=document.createElement(n);for(var k in a){if(k==="class")e.className=a[k];else if(k==="html")e.innerHTML=a[k];else e.setAttribute(k,a[k]);}if(t!==undefined)e.textContent=t;return e;}
+  var EXPECT=70;
+
+  /* ── demonstration data ─────────────────────────────────────────── */
+  var DISTRICTS=[
+    {code:"8",  name:"Potaro-Siparuni",               region:"Region 8",  hinter:true,  pupils:4300,  mastery:39.0, d:+4.2, plans:78, off:22},
+    {code:"1",  name:"Barima-Waini",                  region:"Region 1",  hinter:true,  pupils:6200,  mastery:41.0, d:+3.1, plans:74, off:24},
+    {code:"9",  name:"Upper Takutu-Upper Essequibo",  region:"Region 9",  hinter:true,  pupils:9800,  mastery:43.0, d:+3.8, plans:76, off:21},
+    {code:"7",  name:"Cuyuni-Mazaruni",               region:"Region 7",  hinter:true,  pupils:7100,  mastery:44.0, d:+3.6, plans:71, off:23},
+    {code:"2",  name:"Pomeroon-Supenaam",             region:"Region 2",  hinter:false, pupils:12400, mastery:58.0, d:+2.4, plans:73, off:15},
+    {code:"5",  name:"Mahaica-Berbice",               region:"Region 5",  hinter:false, pupils:11900, mastery:59.0, d:+2.0, plans:72, off:14},
+    {code:"10", name:"Upper Demerara-Berbice",        region:"Region 10", hinter:false, pupils:13700, mastery:60.0, d:+1.9, plans:75, off:13},
+    {code:"3",  name:"Essequibo Islands-W. Demerara", region:"Region 3",  hinter:false, pupils:27800, mastery:62.0, d:+1.8, plans:74, off:12},
+    {code:"6",  name:"East Berbice-Corentyne",        region:"Region 6",  hinter:false, pupils:34200, mastery:63.0, d:+1.5, plans:76, off:11},
+    {code:"4",  name:"Demerara-Mahaica",              region:"Region 4",  hinter:false, pupils:58600, mastery:67.0, d:+1.2, plans:73, off:9},
+    {code:"11", name:"Georgetown",                    region:"District 11",hinter:false,pupils:14000, mastery:71.0, d:+0.9, plans:71, off:7}
+  ];
+
+  var TERMS=["2024 T2","2024 T3","2025 T1","2025 T2","2025 T3","2026 T1"];
+  var SERIES={
+    coast:[60.2,61.1,61.8,62.6,63.3,64.0],
+    hinter:[35.4,36.8,38.1,39.6,41.0,42.2]
+  };
+
+  var STRANDS={
+    "Mathematics":[["Sets",66],["Geometry",63],["Measurement",60],["Operations, Relations and Properties",58],["Statistics and Graphs",57],["Number Concepts",54],["Fractions, Decimals and Percentages",41]],
+    "English Language":[["Listening and Speaking",68],["Grammar and Mechanics",59],["Vocabulary and Spelling",55],["Reading and Comprehension",52],["Writing and Composition",47]],
+    "Science":[["Earth and Environment",66],["Living Things",64],["The Human Body and Health",61],["Matter and Materials",56],["Energy and Forces",52],["Working Scientifically",45]],
+    "Social Studies":[["Our Country Guyana",72],["Our Heritage and History",65],["Resources and Economic Activity",63],["Civics and Government",60],["Geography and Environment",58],["The Caribbean and the Wider World",57]]
+  };
+
+  var JOURNEY=[
+    {g:"Nursery 1",s:"N1",yr:2014,age:"3–4",m:38,band:"well below",
+     head:"A school-readiness screen, not a guess",
+     body:"Anaya enters nursery in Region 8 well below the readiness band. The screen is her first baseline — before this the system would have had nothing on her until Grade 2.",
+     stats:[["Baseline","38%"],["Strands below","4 of 4"],["Plan goals","2"]],
+     mods:[["Listening and Responding",1,2014],["Counting to 10",1,2014],["Naming Shapes",0,2014]]},
+    {g:"Nursery 2",s:"N2",yr:2015,age:"4–5",m:46,band:"below",
+     head:"Letter sounds land; number names do not",
+     body:"Eight points of growth. Letter sounds are mastered, which is the gate to decoding. Number names to 20 stalls at two attempts and carries forward as the first flagged risk.",
+     stats:[["Mastery","46%"],["Growth","+8 pts"],["Modules mastered","3 of 4"]],
+     mods:[["Letter Sounds and Rhyme",1,2015],["Number Names and Order to 20",0,2015],["Sorting and Matching",1,2015]]},
+    {g:"Grade 1",s:"G1",yr:2016,age:"5–6",m:44,band:"below",
+     head:"A dip the old system would not have seen",
+     body:"Mastery falls two points. Blending has not taken. In a termly-report world this shows up as a low mark; here it shows up as a specific strand with two failed checkpoints, in week four.",
+     stats:[["Mastery","44%"],["Growth","−2 pts"],["Off-track goals","2"]],
+     mods:[["Blending and Decoding",0,2016],["Counting and Number Names to 100",1,2016],["Living and Non-Living",1,2016]]},
+    {g:"Grade 2",s:"G2",yr:2017,age:"6–7",m:42,band:"below",assess:"National Grade Two Assessment",
+     head:"The intervention that changed the next nine years",
+     body:"The Grade Two Assessment confirms what the checkpoints already showed. A twelve-week daily blending plan is written against a 42% baseline, and Grade 1 decoding is re-taught at the instructional level rather than pushing on with Grade 2 text.",
+     stats:[["NGTA result","42%"],["Plan length","12 weeks"],["Reading gain","+19 pts"]],
+     mods:[["Blending and Decoding",1,2017],["Sight Words and Simple Texts",1,2017],["Addition and Subtraction to 20",1,2017]]},
+    {g:"Grade 3",s:"G3",yr:2018,age:"7–8",m:51,band:"approaching",
+     head:"Reading fluency clears",
+     body:"Nine points of growth, the largest single-year gain so far, and the first year she is inside the approaching band. Reading stops being the thing that holds every other subject down.",
+     stats:[["Mastery","51%"],["Growth","+9 pts"],["Strands at expectation","1"]],
+     mods:[["Reading Fluency",1,2018],["Writing a Paragraph",1,2018],["Multiplication and Division Facts",0,2018]]},
+    {g:"Grade 4",s:"G4",yr:2019,age:"8–9",m:57,band:"approaching",assess:"National Grade Four Assessment",
+     head:"Maths becomes the new constraint",
+     body:"Literacy is now the stronger side. The Grade Four Assessment puts Fractions, Decimals and Percentages at 34% — the national weak strand showing up in one child. Plan pivots to number.",
+     stats:[["NGFA result","57%"],["Weakest strand","Fractions 34%"],["Plan goals","3"]],
+     mods:[["Main Idea and Supporting Detail",1,2019],["Introducing Fractions",0,2019],["Place Value to 100 000",1,2019]]},
+    {g:"Grade 5",s:"G5",yr:2020,age:"9–10",m:62,band:"approaching",
+     head:"Taught at the level she is at, not the level she is in",
+     body:"The plan reaches back two years: Grade 4 place value, then Grade 4 fractions, then the Grade 5 module. She is enrolled in Grade 5 and instructed where the evidence puts her — which is the whole point of a plan.",
+     stats:[["Mastery","62%"],["Growth","+5 pts"],["Earlier-year modules","2"]],
+     mods:[["Introducing Fractions",1,2020],["Equivalent Fractions",1,2020],["Context Clues",1,2020]]},
+    {g:"Grade 6",s:"G6",yr:2021,age:"10–11",m:71,band:"meeting",assess:"National Grade Six Assessment (NGSA)",
+     head:"Clears the NGSA — nine points above her Grade 4 trajectory",
+     body:"First year at expectation. Placed at a secondary school she would not have reached on the Grade 2 trajectory. The Ministry can trace that result to a specific intervention four years earlier, because the record is continuous.",
+     stats:[["NGSA result","71%"],["Growth","+9 pts"],["Goals met","4 of 4"]],
+     mods:[["Adding and Subtracting Fractions",1,2021],["Inference and Figurative Language",1,2021],["Mean, Median and Mode",1,2021]]},
+    {g:"Form 1",s:"F1",yr:2022,age:"11–12",m:69,band:"approaching",
+     head:"The transition dip, caught in term one",
+     body:"Secondary transfer costs two points — normal, and usually invisible until the end of the year. Her record moves school with her, so the new teacher opens a plan already written rather than starting from nothing.",
+     stats:[["Mastery","69%"],["Growth","−2 pts"],["Record transferred","Day 1"]],
+     mods:[["Comprehension of Longer Texts",1,2022],["Algebraic Expressions",0,2022],["Directed Numbers",1,2022]]},
+    {g:"Form 2",s:"F2",yr:2023,age:"12–13",m:73,band:"meeting",
+     head:"Back above expectation and holding",
+     body:"Algebra clears on the second attempt. Four consecutive terms at or above expectation, so the plan drops from four goals to two and shifts toward extension.",
+     stats:[["Mastery","73%"],["Growth","+4 pts"],["Plan goals","2"]],
+     mods:[["Algebraic Expressions",1,2023],["Solving Linear Equations",1,2023],["Planning a Fair Test",1,2023]]},
+    {g:"Form 3",s:"F3",yr:2024,age:"13–14",m:76,band:"meeting",assess:"National Grade Nine Assessment",
+     head:"Grade Nine confirms the trajectory",
+     body:"Three points of growth and a Grade Nine result consistent with everything the record predicted. Subject choices for CSEC are made against ten years of strand evidence rather than one year's marks.",
+     stats:[["Grade 9 result","76%"],["Growth","+3 pts"],["Strands at expectation","14 of 18"]],
+     mods:[["Summary Writing",1,2024],["Linear Graphs and Relations",1,2024],["Forces, Motion and Electricity",1,2024]]},
+    {g:"Form 4",s:"F4",yr:2025,age:"14–15",m:78,band:"meeting",
+     head:"CSEC preparation, aimed by strand",
+     body:"Consumer arithmetic and persuasive writing are the two strands still under expectation, so those are the two goals. Nothing else is remediated because nothing else needs it.",
+     stats:[["Mastery","78%"],["Growth","+2 pts"],["Plan goals","2"]],
+     mods:[["Money, Wages and Bills",1,2025],["Persuasive and Argument Writing",1,2025],["Discount, Interest and Hire Purchase",0,2025]]},
+    {g:"Form 5",s:"F5",yr:2026,age:"15–16",m:81,band:"exceeding",assess:"CSEC (CXC)",
+     head:"Thirteen years, one record, forty-three points of growth",
+     body:"From 38% at nursery entry to 81% at CSEC. No single year explains it; the record does. That continuity is the asset — for the child, for the teacher who inherits her, and for the Ministry deciding where to put the next intervention.",
+     stats:[["CSEC readiness","81%"],["Total growth","+43 pts"],["Years on plan","13"]],
+     mods:[["Discount, Interest and Hire Purchase",1,2026],["Analysing Argument and Register",1,2026],["Ecosystems and Energy Flow",1,2026]]}
+  ];
+
+  var FUNNEL=[
+    {label:"Grade 2 assessment", sub:"National Grade Two", without:44, with:52},
+    {label:"Grade 4 assessment", sub:"National Grade Four", without:41, with:55},
+    {label:"Grade 6 — NGSA",     sub:"Secondary placement", without:38, with:58},
+    {label:"Form 3 — Grade 9",   sub:"National Grade Nine", without:34, with:57},
+    {label:"Form 5 — CSEC",      sub:"School leaving",      without:29, with:54}
+  ];
+
+  /* ── derived helpers ─────────────────────────────────────────────── */
+  function wmean(rows,key){
+    var p=0,s=0; rows.forEach(function(r){p+=r.pupils; s+=r.pupils*r[key];});
+    return p?s/p:0;
+  }
+  function fmt(n,d){return n.toLocaleString("en-US",{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+  function band(m){return m>=85?"exceeding":m>=70?"meeting":m>=55?"approaching":m>=40?"below":"well below";}
+  function pillClass(m){return m>=70?"good":m>=55?"warn":"crit";}
+  function level(m){return m>=75?6:m>=68?5:m>=60?4:m>=52?3:m>=45?2:1;}
+
+  var state={scope:"all",district:"",stage:"all"};
+
+  function rows(){
+    var r=DISTRICTS.slice();
+    if(state.district) return r.filter(function(x){return x.code===state.district;});
+    if(state.scope==="coast") return r.filter(function(x){return !x.hinter;});
+    if(state.scope==="hinter") return r.filter(function(x){return x.hinter;});
+    return r;
+  }
+  /* Stage shifts the picture: secondary sits a little above primary nationally. */
+  function stageAdj(){return state.stage==="primary"?-1.4:state.stage==="secondary"?+2.1:0;}
+
+  function scopeName(){
+    return state.district
+      ? (DISTRICTS.filter(function(x){return x.code===state.district;})[0].name)
+      : state.scope==="coast"?"seven coastal districts"
+      : state.scope==="hinter"?"four hinterland districts":"all eleven districts";
+  }
+
+  /* ── KPI tiles ───────────────────────────────────────────────────── */
+  function renderKpis(){
+    var r=rows(), adj=stageAdj();
+    var pupils=r.reduce(function(a,x){return a+x.pupils;},0);
+    var mastery=wmean(r,"mastery")+adj;
+    var delta=wmean(r,"d");
+    var plans=wmean(r,"plans");
+    var off=wmean(r,"off");
+    var coastM=wmean(DISTRICTS.filter(function(x){return !x.hinter;}),"mastery");
+    var hintM=wmean(DISTRICTS.filter(function(x){return x.hinter;}),"mastery");
+    var gap=coastM-hintM;
+
+    var tiles=[
+      {k:"Mastery at expectation",v:mastery.toFixed(1),u:"%",
+       d:delta,dl:"points this term",note:scopeName()},
+      {k:"Learners in scope",v:fmt(pupils),u:"",
+       d:null,dl:Math.round(pupils/200000*1000)/10+"% of the national roll",note:""},
+      {k:"Coast–hinterland gap",v:gap.toFixed(1),u:" pts",
+       d:-0.5,dl:"narrowing, per term",note:"national figure, unaffected by filters",invert:true},
+      {k:"Learners on an active plan",v:plans.toFixed(0),u:"%",
+       d:+2.6,dl:"points this term",note:fmt(Math.round(pupils*plans/100))+" pupils"},
+      {k:"Goals off track",v:off.toFixed(0),u:"%",
+       d:-1.3,dl:"points this term",note:"needs a teacher this week",invert:true}
+    ];
+
+    var box=document.getElementById("kpis"); box.innerHTML="";
+    tiles.forEach(function(t){
+      var tile=h("div",{class:"kpi"});
+      tile.appendChild(h("div",{class:"k"},t.k));
+      var v=h("div",{class:"v"}); v.appendChild(document.createTextNode(t.v));
+      if(t.u) v.appendChild(h("small",{},t.u));
+      tile.appendChild(v);
+      var d=h("div",{class:"d"});
+      if(t.d!==null&&t.d!==undefined){
+        var good=t.invert?t.d<0:t.d>0;
+        var cls=t.d===0?"flat":(good?"up":"down");
+        d.appendChild(h("span",{class:"delta "+cls},(t.d>0?"▲ +":t.d<0?"▼ ":"■ ")+Math.abs(t.d).toFixed(1)));
+      }
+      d.appendChild(h("span",{},t.dl));
+      tile.appendChild(d);
+      if(t.note) tile.appendChild(h("div",{class:"note"},t.note));
+      box.appendChild(tile);
+    });
+  }
+
+  /* ── trend chart ─────────────────────────────────────────────────── */
+  function renderTrend(){
+    var svg=document.getElementById("trend"); svg.innerHTML="";
+    var W=900,H=300,L=52,R=118,T=18,B=48;
+    var pw=W-L-R, ph=H-T-B;
+    var lo=30, hi=75;
+    var x=function(i){return L+(i/(TERMS.length-1))*pw;};
+    var y=function(v){return T+ph-((v-lo)/(hi-lo))*ph;};
+
+    [30,40,50,60,70].forEach(function(t){
+      var isExp=t===EXPECT;
+      svg.appendChild(el("line",{x1:L,x2:L+pw,y1:y(t),y2:y(t),
+        stroke:isExp?"var(--muted)":"var(--rule-soft)","stroke-width":isExp?2:1,
+        "stroke-dasharray":isExp?"5 4":"", opacity:isExp?.55:1}));
+      svg.appendChild(el("text",{x:L-10,y:y(t)+4,"text-anchor":"end",fill:"var(--muted)",
+        "font-size":11,"font-family":"IBM Plex Mono, monospace"},t+"%"));
+    });
+    svg.appendChild(el("text",{x:L+pw+8,y:y(EXPECT)+4,fill:"var(--muted)","font-size":11,
+      "font-family":"IBM Plex Mono, monospace"},"expectation"));
+
+    TERMS.forEach(function(t,i){
+      svg.appendChild(el("text",{x:x(i),y:H-B+22,"text-anchor":"middle",fill:"var(--muted)",
+        "font-size":11.5,"font-family":"IBM Plex Mono, monospace"},t));
+    });
+
+    /* gap band — the story of the chart */
+    var gd="M"+x(0)+" "+y(SERIES.coast[0]);
+    for(var i=1;i<TERMS.length;i++) gd+="L"+x(i)+" "+y(SERIES.coast[i]);
+    for(var j=TERMS.length-1;j>=0;j--) gd+="L"+x(j)+" "+y(SERIES.hinter[j]);
+    gd+="Z";
+    svg.appendChild(el("path",{d:gd,fill:"var(--ink)",opacity:.045}));
+
+    /* The scope control cannot remove a series here — the gap needs both — but it
+       can say which side the reader is asking about. */
+    var emph={coast:state.scope==="hinter"?.35:1, hinter:state.scope==="coast"?.35:1};
+
+    [["hinter","var(--hinter)","Hinterland"],["coast","var(--coast)","Coastal"]].forEach(function(s){
+      var o=emph[s[0]];
+      var d="";
+      SERIES[s[0]].forEach(function(v,i){d+=(i?"L":"M")+x(i)+" "+y(v);});
+      svg.appendChild(el("path",{d:d,fill:"none",stroke:s[1],"stroke-width":2.5,
+        "stroke-linejoin":"round","stroke-linecap":"round",opacity:o}));
+      SERIES[s[0]].forEach(function(v,i){
+        svg.appendChild(el("circle",{cx:x(i),cy:y(v),r:4,fill:s[1],
+          stroke:"var(--surface)","stroke-width":2,opacity:o}));
+      });
+      var last=SERIES[s[0]][TERMS.length-1];
+      svg.appendChild(el("text",{x:x(TERMS.length-1)+12,y:y(last)+4,fill:s[1],
+        "font-size":12.5,"font-weight":600,"font-family":"IBM Plex Mono, monospace",opacity:o},
+        last.toFixed(1)+"%"));
+      svg.appendChild(el("text",{x:x(TERMS.length-1)+12,y:y(last)+19,fill:"var(--muted)",
+        "font-size":10.5,"font-family":"Public Sans, sans-serif",opacity:o},s[2]));
+    });
+
+    /* gap callout at the mid-point of the band */
+    var mi=Math.floor(TERMS.length/2);
+    var gy=(y(SERIES.coast[mi])+y(SERIES.hinter[mi]))/2;
+    svg.appendChild(el("text",{x:x(mi),y:gy,"text-anchor":"middle",fill:"var(--ink-2)",
+      "font-size":12,"font-weight":600,"font-family":"Public Sans, sans-serif"},"the gap"));
+    svg.appendChild(el("text",{x:x(mi),y:gy+17,"text-anchor":"middle",fill:"var(--muted)",
+      "font-size":11.5,"font-family":"IBM Plex Mono, monospace"},
+      (SERIES.coast[0]-SERIES.hinter[0]).toFixed(1)+" → "+
+      (SERIES.coast[TERMS.length-1]-SERIES.hinter[TERMS.length-1]).toFixed(1)+" pts"));
+
+    /* crosshair + tooltip */
+    var tip=document.getElementById("tipTrend"), box=svg.parentNode;
+    var cross=el("line",{x1:0,x2:0,y1:T,y2:T+ph,stroke:"var(--ink)","stroke-width":1,opacity:0});
+    svg.appendChild(cross);
+    TERMS.forEach(function(t,i){
+      var hit=el("rect",{x:x(i)-pw/(TERMS.length-1)/2,y:T,width:pw/(TERMS.length-1),height:ph,
+        fill:"transparent"});
+      hit.addEventListener("mouseenter",function(){
+        var r=box.getBoundingClientRect();
+        cross.setAttribute("x1",x(i)); cross.setAttribute("x2",x(i));
+        cross.setAttribute("opacity",".2");
+        tip.innerHTML="<b>"+t+"</b><br>Coastal "+SERIES.coast[i].toFixed(1)+"%<br>Hinterland "+
+          SERIES.hinter[i].toFixed(1)+"%<br>Gap "+(SERIES.coast[i]-SERIES.hinter[i]).toFixed(1)+" pts";
+        tip.style.left=(x(i)/W)*r.width+"px";
+        tip.style.top=(y(SERIES.coast[i])/H)*r.height+"px";
+        tip.style.opacity="1";
+      });
+      hit.addEventListener("mouseleave",function(){tip.style.opacity="0";cross.setAttribute("opacity",0);});
+      svg.appendChild(hit);
+    });
+  }
+
+  /* ── district table ──────────────────────────────────────────────── */
+  function renderTable(){
+    var tb=document.getElementById("districtRows"); tb.innerHTML="";
+    var list=rows();
+    list.forEach(function(d){
+      var tr=h("tr",d.hinter?{class:"hint"}:{});
+      tr.appendChild(h("td",{html:"<b>"+d.region+"</b> &nbsp;<span style='color:var(--muted)'>"+d.name+"</span>"}));
+      tr.appendChild(h("td",{class:"num"},fmt(d.pupils)));
+      var bt=h("td",{});
+      bt.innerHTML='<span class="bar"><span class="track"><i style="width:'+d.mastery+
+        '%;background:'+(d.mastery>=70?"var(--good)":d.mastery>=55?"var(--warn)":"var(--crit)")+
+        '"></i><u style="left:'+EXPECT+'%"></u></span></span>';
+      tr.appendChild(bt);
+      tr.appendChild(h("td",{class:"num"},d.mastery.toFixed(1)+"%"));
+      var dt=h("td",{class:"num"}); dt.innerHTML='<span style="color:var(--good)">+'+d.d.toFixed(1)+"</span>";
+      tr.appendChild(dt);
+      tr.appendChild(h("td",{class:"num"},d.plans+"%"));
+      tr.appendChild(h("td",{class:"num"},d.off+"%"));
+      var st=h("td",{});
+      st.innerHTML='<span class="pill '+pillClass(d.mastery)+'">'+band(d.mastery)+"</span>";
+      tr.appendChild(st);
+      tb.appendChild(tr);
+    });
+
+    var sub=document.getElementById("tableSub");
+    var hint=list.filter(function(x){return x.hinter;}).length;
+    if(list.length===DISTRICTS.length){
+      sub.textContent="Sorted weakest first. The four hinterland districts are shaded — they hold 13.7% of learners and every one of the five lowest mastery rates.";
+    }else if(list.length===1){
+      sub.textContent=list[0].region+" — "+list[0].name+", shown alone. Clear the district to compare it against the rest.";
+    }else{
+      sub.textContent="Sorted weakest first. Showing "+list.length+" of "+DISTRICTS.length+
+        " districts"+(hint?" — all shaded rows are hinterland":"")+".";
+    }
+  }
+
+  /* ── strand heatmap ──────────────────────────────────────────────── */
+  function renderHeat(){
+    var box=document.getElementById("heat"); box.innerHTML="";
+    Object.keys(STRANDS).forEach(function(subj){
+      var col=h("div",{class:"hsub"});
+      col.appendChild(h("h3",{},subj));
+      STRANDS[subj].forEach(function(p){
+        var row=h("div",{class:"hrow"});
+        row.appendChild(h("div",{class:"n"},p[0]));
+        var c=h("div",{class:"cell"},p[1]+"%");
+        c.setAttribute("data-l",level(p[1]));
+        c.setAttribute("title",subj+" · "+p[0]+" · "+p[1]+"% mastery, "+band(p[1]));
+        row.appendChild(c);
+        col.appendChild(row);
+      });
+      box.appendChild(col);
+    });
+  }
+
+  /* ── the journey ─────────────────────────────────────────────────── */
+  var selected=7; /* Grade 6 / NGSA — the pivot */
+
+  function renderJourney(){
+    var svg=document.getElementById("journey"); svg.innerHTML="";
+    var W=900,H=260,L=48,R=26,T=16,B=62;
+    var pw=W-L-R, ph=H-T-B;
+    var lo=30, hi=90;
+    var x=function(i){return L+(i/(JOURNEY.length-1))*pw;};
+    var y=function(v){return T+ph-((v-lo)/(hi-lo))*ph;};
+
+    [30,50,70,90].forEach(function(t){
+      var isExp=t===EXPECT;
+      svg.appendChild(el("line",{x1:L,x2:L+pw,y1:y(t),y2:y(t),
+        stroke:isExp?"var(--muted)":"var(--rule-soft)","stroke-width":isExp?2:1,
+        "stroke-dasharray":isExp?"5 4":"",opacity:isExp?.55:1}));
+      svg.appendChild(el("text",{x:L-9,y:y(t)+4,"text-anchor":"end",fill:"var(--muted)",
+        "font-size":11,"font-family":"IBM Plex Mono, monospace"},t+"%"));
+    });
+
+    /* stage bands */
+    [["Nursery",0,1],["Primary",2,7],["Secondary",8,12]].forEach(function(s){
+      var x0=x(s[1])-(s[1]===0?14:16), x1=x(s[2])+16;
+      svg.appendChild(el("line",{x1:x0,x2:x1,y1:H-B+34,y2:H-B+34,
+        stroke:"var(--rule)","stroke-width":1}));
+      svg.appendChild(el("text",{x:(x0+x1)/2,y:H-B+49,"text-anchor":"middle",fill:"var(--muted)",
+        "font-size":10.5,"letter-spacing":"0.12em","font-family":"IBM Plex Mono, monospace"},
+        s[0].toUpperCase()));
+    });
+
+    var area="M"+x(0)+" "+y(lo);
+    JOURNEY.forEach(function(p,i){area+="L"+x(i)+" "+y(p.m);});
+    area+="L"+x(JOURNEY.length-1)+" "+y(lo)+"Z";
+    svg.appendChild(el("path",{d:area,fill:"var(--accent)",opacity:.09}));
+
+    var line="";
+    JOURNEY.forEach(function(p,i){line+=(i?"L":"M")+x(i)+" "+y(p.m);});
+    svg.appendChild(el("path",{d:line,fill:"none",stroke:"var(--accent)","stroke-width":2.5,
+      "stroke-linejoin":"round","stroke-linecap":"round"}));
+
+    var tip=document.getElementById("tipJ"), box=svg.parentNode;
+
+    JOURNEY.forEach(function(p,i){
+      if(p.assess){
+        svg.appendChild(el("line",{x1:x(i),x2:x(i),y1:T,y2:y(p.m)-9,
+          stroke:"var(--hinter)","stroke-width":1,"stroke-dasharray":"3 3",opacity:.6}));
+        svg.appendChild(el("circle",{cx:x(i),cy:y(p.m),r:8,fill:"var(--hinter)",
+          stroke:"var(--surface)","stroke-width":2.5}));
+      }
+      var sel=i===selected;
+      svg.appendChild(el("circle",{cx:x(i),cy:y(p.m),r:sel?6.5:4.5,
+        fill:sel?"var(--ink)":"var(--accent)",stroke:"var(--surface)","stroke-width":2.5}));
+
+      svg.appendChild(el("text",{x:x(i),y:H-B+18,"text-anchor":"middle",
+        fill:sel?"var(--ink)":"var(--muted)","font-size":11.5,"font-weight":sel?700:500,
+        "font-family":"IBM Plex Mono, monospace"},p.s));
+
+      var hit=el("rect",{x:x(i)-pw/(JOURNEY.length-1)/2,y:T,
+        width:pw/(JOURNEY.length-1),height:ph+34,fill:"transparent"});
+      hit.style.cursor="pointer";
+      hit.addEventListener("mouseenter",function(){
+        var r=box.getBoundingClientRect();
+        tip.innerHTML="<b>"+p.g+" · "+p.yr+"</b><br>"+p.m+"% · "+p.band+
+          (p.assess?"<br>"+p.assess:"");
+        tip.style.left=(x(i)/W)*r.width+"px";
+        tip.style.top=(y(p.m)/H)*r.height+"px";
+        tip.style.opacity="1";
+      });
+      hit.addEventListener("mouseleave",function(){tip.style.opacity="0";});
+      hit.addEventListener("click",function(){selected=i;renderJourney();renderJourneyDetail();});
+      svg.appendChild(hit);
+    });
+  }
+
+  function renderJourneyDetail(){
+    var p=JOURNEY[selected];
+    var t=document.getElementById("jdText"); t.innerHTML="";
+    t.appendChild(h("h3",{},p.head));
+    t.appendChild(h("div",{class:"when"},
+      p.g+" · "+p.yr+" · age "+p.age+" · "+p.band+(p.assess?" · "+p.assess:"")));
+    t.appendChild(h("p",{},p.body));
+
+    var s=document.getElementById("jdStats"); s.innerHTML="";
+    p.stats.forEach(function(kv){
+      var d=h("div",{class:"jstat"});
+      d.appendChild(h("div",{class:"k"},kv[0]));
+      d.appendChild(h("div",{class:"v"},kv[1]));
+      s.appendChild(d);
+    });
+
+    var m=document.getElementById("jdMods"); m.innerHTML="";
+    m.appendChild(h("li",{html:'<span style="font-family:IBM Plex Mono,monospace;font-size:10px;'+
+      'letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600">'+
+      'Assigned modules</span>'}));
+    p.mods.forEach(function(md){
+      var li=h("li",{});
+      li.appendChild(h("span",{class:"tick"+(md[1]?"":" pend")},md[1]?"✓":"○"));
+      li.appendChild(h("span",{},md[0]));
+      li.appendChild(h("span",{class:"yr"},md[1]?"mastered":"carried forward"));
+      m.appendChild(li);
+    });
+  }
+
+  /* ── cohort funnel ───────────────────────────────────────────────── */
+  function renderFunnel(){
+    var box=document.getElementById("funnel"); box.innerHTML="";
+    FUNNEL.forEach(function(f){
+      var row=h("div",{class:"frow"});
+      var lab=h("div",{class:"fl"}); lab.appendChild(document.createTextNode(f.label));
+      lab.appendChild(h("small",{},f.sub));
+      row.appendChild(lab);
+      var bars=h("div",{class:"fbars"});
+      [["Today",f.without,"var(--muted)",".5"],["With plans",f.with,"var(--accent)","1"]].forEach(function(b){
+        var fb=h("div",{class:"fbar"});
+        fb.appendChild(h("span",{class:"lab"},b[0]));
+        var tr=h("span",{class:"t"});
+        tr.innerHTML='<i style="width:'+b[1]+'%;background:'+b[2]+';opacity:'+b[3]+'"></i>';
+        fb.appendChild(tr);
+        fb.appendChild(h("span",{class:"val"},b[1]));
+        bars.appendChild(fb);
+      });
+      row.appendChild(bars);
+      box.appendChild(row);
+    });
+  }
+
+  /* ── the arithmetic of the gap ───────────────────────────────────── */
+  /* Derived entirely from DISTRICTS and the stated 1.5pt/yr closing rate, so the
+     panel cannot drift from the table underneath it. */
+  var CLOSING_RATE=1.5;
+  function renderGapMath(){
+    var hint=DISTRICTS.filter(function(d){return d.hinter;});
+    var coast=DISTRICTS.filter(function(d){return !d.hinter;});
+    var hintPupils=hint.reduce(function(a,d){return a+d.pupils;},0);
+    var gap=wmean(coast,"mastery")-wmean(hint,"mastery");
+    var children=Math.round(hintPupils*gap/100);
+    var years=gap/CLOSING_RATE;
+    var career=JOURNEY.length; /* Nursery 1 to Form 5 */
+
+    var tiles=[
+      {v:fmt(children),u:"",l:"Hinterland children below expectation who would be at it under coastal conditions. This is the number the programme exists to reduce.",hero:true},
+      {v:gap.toFixed(1),u:" pts",l:"The gap today, across "+fmt(hintPupils)+" hinterland learners in Regions 1, 7, 8 and 9."},
+      {v:years.toFixed(1),u:" yrs",l:"To parity at the current rate of "+CLOSING_RATE.toFixed(1)+" points a year, if nothing changes."},
+      {v:career,u:" yrs",l:"The length of one Guyanese school career, Nursery 1 to Form 5."}
+    ];
+    var box=document.getElementById("gapStats"); box.innerHTML="";
+    tiles.forEach(function(t){
+      var d=h("div",{class:"gstat"+(t.hero?" hero":"")});
+      var v=h("div",{class:"v"}); v.appendChild(document.createTextNode(t.v));
+      if(t.u) v.appendChild(h("small",{},t.u));
+      d.appendChild(v);
+      d.appendChild(h("div",{class:"l"},t.l));
+      box.appendChild(d);
+    });
+
+    document.getElementById("gapVerdict").innerHTML=
+      "At the present rate the gap takes <b>"+years.toFixed(1)+" years</b> to close, and a Guyanese school career lasts <b>"+
+      career+"</b>. A child starting Nursery 1 in Region 8 this September therefore <b>leaves school before the hinterland reaches where the coast already is.</b> Closing it faster is the entire case for this programme.";
+  }
+
+  /* ── filters ─────────────────────────────────────────────────────── */
+  var sel=document.getElementById("districtSel");
+  DISTRICTS.slice().sort(function(a,b){return (+a.code)-(+b.code);}).forEach(function(d){
+    sel.appendChild(h("option",{value:d.code},d.region+" — "+d.name));
+  });
+
+  function setSeg(id,key,val){
+    var g=document.getElementById(id);
+    [].forEach.call(g.querySelectorAll("button"),function(x){
+      x.setAttribute("aria-pressed",x.getAttribute("data-"+key)===val);
+    });
+  }
+
+  function renderScopeLine(){
+    var bits=[scopeName()];
+    if(state.stage!=="all") bits.push(state.stage==="primary"?"primary only":"secondary only");
+    document.getElementById("fscope").innerHTML="Showing <b>"+bits.join("</b> · <b>")+"</b>";
+  }
+
+  /* Everything the filters legitimately drive re-renders together. Panels with no
+     per-district data are flagged in their headings instead of moving. */
+  function applyFilters(){
+    renderKpis();
+    renderTable();
+    renderTrend();
+    renderScopeLine();
+  }
+
+  sel.addEventListener("change",function(){
+    state.district=sel.value;
+    /* A named district overrides the coast/hinterland split, so reset that control
+       rather than leaving two contradictory selections lit. */
+    if(state.district){ state.scope="all"; setSeg("scopeSeg","scope","all"); }
+    applyFilters();
+  });
+
+  function seg(id,key){
+    var g=document.getElementById(id);
+    g.addEventListener("click",function(e){
+      var b=e.target.closest("button"); if(!b)return;
+      state[key]=b.getAttribute("data-"+key);
+      setSeg(id,key,state[key]);
+      if(key==="scope"){state.district="";sel.value="";}
+      applyFilters();
+    });
+  }
+  seg("scopeSeg","scope");
+  seg("stageSeg","stage");
+
+  renderKpis(); renderTrend(); renderGapMath(); renderTable(); renderHeat();
+  renderJourney(); renderJourneyDetail(); renderFunnel(); renderScopeLine();
+})();
+</script>
+
+</html>

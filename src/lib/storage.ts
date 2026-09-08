@@ -2,6 +2,7 @@
 
 import { LEITNER_INTERVALS } from './constants';
 import type { Student, Session, SREntry, UploadedDoc } from './types';
+import type { AssessmentRecord, IEP, ModuleAssignment } from './iep-types';
 
 const PREFIX = 'liq_';
 
@@ -38,12 +39,12 @@ export function saveStudents(students: Student[]): void {
   set('students', students);
 }
 
-export function addStudent(name: string, grade: string, state: string): Student {
+export function addStudent(name: string, grade: string, district: string): Student {
   const student: Student = {
     id: 'stu_' + Date.now(),
     name,
     grade,
-    state,
+    district,
     created: new Date().toISOString(),
   };
   const students = getStudents();
@@ -158,4 +159,54 @@ export function getCachedQuestions(key: string): { questions: unknown[]; timesta
 export function setCachedQuestions(key: string, questions: unknown[]): void {
   set(key, questions);
   set(key + '_t', Date.now());
+}
+
+// ── Assessment intake, plans and module assignments ──
+
+export function getAssessments(): AssessmentRecord[] {
+  return get<AssessmentRecord[]>('assessments', []);
+}
+
+export function saveAssessments(records: AssessmentRecord[]): void {
+  set('assessments', records);
+}
+
+/** Append imported records, replacing any row already stored under the same id. */
+export function addAssessments(records: AssessmentRecord[]): AssessmentRecord[] {
+  const existing = getAssessments();
+  const byId = new Map(existing.map(r => [r.id, r]));
+  for (const record of records) byId.set(record.id, record);
+  const merged = [...byId.values()];
+  saveAssessments(merged);
+  return merged;
+}
+
+export function getPlans(): IEP[] {
+  return get<IEP[]>('plans', []);
+}
+
+export function savePlans(plans: IEP[]): void {
+  set('plans', plans);
+}
+
+/** Insert or replace a plan, keyed on id. */
+export function upsertPlan(plan: IEP): IEP[] {
+  const plans = getPlans().filter(p => p.id !== plan.id);
+  plans.push(plan);
+  savePlans(plans);
+  return plans;
+}
+
+export function getAssignments(): ModuleAssignment[] {
+  return get<ModuleAssignment[]>('assignments', []);
+}
+
+export function saveAssignments(assignments: ModuleAssignment[]): void {
+  set('assignments', assignments);
+}
+
+export function getPlanForStudent(studentId: string): IEP | null {
+  const plans = getPlans().filter(p => p.studentId === studentId);
+  if (plans.length === 0) return null;
+  return plans.sort((a, b) => b.created.localeCompare(a.created))[0];
 }

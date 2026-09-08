@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/app-context';
-import { SUBJECTS, GRADE_CONFIG, STATES, STANDARDS_MAP } from '@/lib/constants';
+import { SUBJECTS, GRADE_CONFIG, CURRICULUM_AUTHORITY, STANDARDS_MAP } from '@/lib/constants';
 import { getAdaptiveQuestions } from '@/lib/adaptive-engine';
 import { updateSR } from '@/lib/storage';
 import type { Question } from '@/lib/types';
@@ -13,9 +13,9 @@ export default function Quiz({ subject, onDone, onBack }: {
   onBack: () => void;
 }) {
   const { user, recordSession } = useApp();
-  const grade = user?.grade || '5th';
-  const state = user?.state || 'DC';
-  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['5th'];
+  const grade = user?.grade || 'grade6';
+  const district = user?.district || '4';
+  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['grade6'];
   const subj = SUBJECTS.find(s => s.id === subject);
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -44,7 +44,7 @@ export default function Quiz({ subject, onDone, onBack }: {
         const res = await fetch('/api/generate-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subject, grade, state, count: gc.qCount }),
+          body: JSON.stringify({ subject, grade, district, count: gc.qCount }),
         });
         const data = await res.json();
         if (data.questions && data.questions.length > 0) {
@@ -58,7 +58,7 @@ export default function Quiz({ subject, onDone, onBack }: {
       setLoading(false);
     }
     loadQuestions();
-  }, [subject, grade, state, gc.qCount, user?.id]);
+  }, [subject, grade, district, gc.qCount, user?.id]);
 
   if (loading) {
     return (
@@ -68,7 +68,7 @@ export default function Quiz({ subject, onDone, onBack }: {
           <div className="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin" />
         </div>
         <p className="text-gray-500 font-semibold text-sm">Preparing {subj?.name} questions...</p>
-        <p className="text-gray-400 text-xs mt-1">Aligned to {STATES.find(s => s.code === state)?.std || 'state'} standards</p>
+        <p className="text-gray-400 text-xs mt-1">Aligned to the {CURRICULUM_AUTHORITY}</p>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function Quiz({ subject, onDone, onBack }: {
           <div className="absolute inset-0 bg-gradient-to-b from-blue-700/85 to-indigo-800/90" />
         </div>
         <div className="relative z-10 text-center">
-          <div className="text-6xl mb-4">{pct >= 80 ? '&#127942;' : pct >= 60 ? '&#11088;' : '&#128170;'}</div>
+          <div className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 60 ? '⭐' : '💪'}</div>
           <div className="text-5xl font-black mb-2">{pct}%</div>
           <p className="text-white/70 mb-1">{correct} of {questions.length} correct</p>
           <p className="text-amber-300 font-bold mb-6">+{xp} XP earned</p>
@@ -175,8 +175,8 @@ export default function Quiz({ subject, onDone, onBack }: {
           <span className="text-[10px] text-gray-400 font-bold">{cur + 1}/{questions.length}</span>
         </div>
         <div className="flex items-center gap-3 text-[11px]">
-          <span className="text-amber-500 font-bold">&#9889; {xp} XP</span>
-          {streak >= 2 && <span className="text-orange-500 font-bold">&#128293; {streak} streak!</span>}
+          <span className="text-amber-500 font-bold">⚡ {xp} XP</span>
+          {streak >= 2 && <span className="text-orange-500 font-bold">🔥 {streak} streak!</span>}
           <span className={`ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold ${
             q.bl === 'remember' ? 'bg-green-100 text-green-700'
             : q.bl === 'understand' ? 'bg-blue-100 text-blue-700'

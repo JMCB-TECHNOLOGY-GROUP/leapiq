@@ -1,28 +1,35 @@
 'use client';
 
 import { useApp } from '@/lib/app-context';
-import { SUBJECTS, GRADE_CONFIG, STATES } from '@/lib/constants';
+import { SUBJECTS, GRADE_CONFIG, EDUCATION_DISTRICTS } from '@/lib/constants';
 import { getDueQuestions } from '@/lib/storage';
 import { getSubjectPerformance, identifyGaps, calculateVelocity } from '@/lib/adaptive-engine';
+import { activeQueue, summarisePlan } from '@/lib/iep-progress';
+import { getModule } from '@/data/curriculum';
 
-export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, onLogout }: {
+export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, onLogout, onPlan }: {
   onQuiz: (subject: string) => void;
   onTutor: (subject: string) => void;
   onReview: () => void;
   onUpload: () => void;
   onLogout: () => void;
+  onPlan: () => void;
 }) {
-  const { user, sessions } = useApp();
+  const { user, sessions, getPlanForStudent, getAssignmentsForStudent } = useApp();
   if (!user) return null;
 
   const studentSessions = sessions.filter(s => s.studentId === user.id);
   const totalXP = studentSessions.reduce((s, p) => s + (p.xp || 0), 0);
   const dueCount = getDueQuestions(user.id).length;
   const today = studentSessions.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).length;
-  const gc = GRADE_CONFIG[user.grade] || GRADE_CONFIG['5th'];
-  const stateName = STATES.find(s => s.code === user.state)?.name || '';
+  const gc = GRADE_CONFIG[user.grade] || GRADE_CONFIG['grade6'];
+  const districtName = EDUCATION_DISTRICTS.find(d => d.code === user.district)?.name || '';
   const gaps = identifyGaps(studentSessions);
   const velocity = calculateVelocity(studentSessions);
+  const plan = getPlanForStudent(user.id);
+  const assignments = getAssignmentsForStudent(user.id);
+  const upNext = plan ? activeQueue(plan, assignments) : [];
+  const planSummary = plan ? summarisePlan(plan, assignments) : null;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
@@ -37,7 +44,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
             <div>
               <p className="text-blue-200 text-xs">Welcome back</p>
               <h1 className="text-2xl font-black text-white">{user.name}</h1>
-              <p className="text-blue-200/60 text-[10px]">{gc.label} &middot; {stateName}</p>
+              <p className="text-blue-200/60 text-[10px]">{gc.label} &middot; {districtName}</p>
             </div>
             <button onClick={onLogout} className="text-blue-200 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
           </div>
@@ -58,6 +65,44 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
       </div>
 
       <div className="px-5 -mt-3">
+        {/* Learning plan */}
+        {plan && planSummary && (
+          <div className="bg-white border border-indigo-200 rounded-2xl p-4 mt-4 mb-2">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex-1">
+                <div className="font-bold text-sm text-gray-900">My Learning Plan</div>
+                <div className="text-[10px] text-gray-400">
+                  {planSummary.met} of {planSummary.goals} goals met &middot;{' '}
+                  {planSummary.modulesMastered}/{planSummary.modulesAssigned} modules mastered
+                </div>
+              </div>
+              <button onClick={onPlan} className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">
+                View
+              </button>
+            </div>
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+              <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${planSummary.averageGrowth}%` }} />
+            </div>
+            {upNext.length > 0 && (
+              <>
+                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">Up next</div>
+                <div className="space-y-1">
+                  {upNext.slice(0, 3).map(a => {
+                    const mod = getModule(a.moduleId);
+                    return (
+                      <div key={a.id} className="flex items-center gap-2 text-[11px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" aria-hidden />
+                        <span className="text-gray-700 truncate flex-1">{mod?.title ?? a.moduleId}</span>
+                        <span className="text-gray-400 flex-shrink-0">{mod?.minutes ?? 0} min</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Knowledge Gaps Alert */}
         {gaps.length > 0 && (
           <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl p-4 mt-4 mb-2">
@@ -78,7 +123,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
         {/* Review Due */}
         {dueCount > 0 && (
           <button onClick={onReview} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl p-4 mt-3 mb-2 flex items-center gap-3 active:scale-95 transition-transform shadow-lg shadow-orange-500/20">
-            <span className="text-2xl animate-pulse-gentle">&#128260;</span>
+            <span className="text-2xl animate-pulse-gentle">🔄</span>
             <div className="text-left">
               <div className="font-bold text-sm">{dueCount} questions due for review</div>
               <div className="text-white/70 text-xs">Spaced repetition keeps it in your brain</div>
@@ -88,7 +133,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
 
         {/* Upload Documents */}
         <button onClick={onUpload} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 mb-1 flex items-center gap-3 active:scale-98 transition-transform hover:border-blue-300">
-          <span className="text-xl">&#128196;</span>
+          <span className="text-xl">📄</span>
           <div className="text-left">
             <div className="font-semibold text-sm text-gray-900">Upload Study Materials</div>
             <div className="text-gray-400 text-[11px]">Tests, worksheets, study guides</div>
@@ -113,10 +158,10 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
                 </div>
                 <div className="p-2.5 space-y-1.5">
                   <button onClick={() => onQuiz(s.id)} className={`w-full py-2 ${s.bg} ${s.tx} font-bold rounded-xl text-xs active:scale-95 transition-transform`}>
-                    &#128221; Quiz
+                    📝 Quiz
                   </button>
                   <button onClick={() => onTutor(s.id)} className={`w-full py-2 border ${s.bd} ${s.tx} font-bold rounded-xl text-xs active:scale-95 transition-transform`}>
-                    &#129302; AI Tutor
+                    🤖 AI Tutor
                   </button>
                 </div>
               </div>
@@ -132,7 +177,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
               const subj = SUBJECTS.find(x => x.id === s.subject);
               return (
                 <div key={i} className="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3 mb-2">
-                  <span className="text-lg">{subj?.icon || '&#128218;'}</span>
+                  <span className="text-lg">{subj?.icon || '📚'}</span>
                   <div className="flex-1">
                     <div className="font-bold text-xs text-gray-900">{subj?.name} Quiz</div>
                     <div className="text-[10px] text-gray-400">{new Date(s.date).toLocaleDateString()}</div>

@@ -24,7 +24,7 @@ export default function ReviewMode({ onBack }: { onBack: () => void }) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-white/95" />
-        <div className="relative z-10 text-5xl mb-4">&#9989;</div>
+        <div className="relative z-10 text-5xl mb-4">✅</div>
         <h1 className="relative z-10 text-xl font-black text-gray-900 mb-2">All caught up!</h1>
         <p className="relative z-10 text-gray-500 text-sm mb-6">No questions due for review. Keep practicing to add more!</p>
         <button onClick={onBack} className="relative z-10 bg-blue-500 text-white font-bold py-3 px-8 rounded-xl active:scale-95 transition-transform">
@@ -37,7 +37,7 @@ export default function ReviewMode({ onBack }: { onBack: () => void }) {
   if (cur >= questions.length) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-orange-500 to-red-500 text-white">
-        <div className="text-5xl mb-4">&#127942;</div>
+        <div className="text-5xl mb-4">🏆</div>
         <div className="text-4xl font-black mb-2">{Math.round((score / questions.length) * 100)}%</div>
         <p className="text-white/70 mb-6">{score} of {questions.length} reviewed</p>
         <button onClick={onBack} className="bg-white/20 text-white font-bold py-3 px-8 rounded-xl active:scale-95">Done</button>
@@ -68,7 +68,7 @@ export default function ReviewMode({ onBack }: { onBack: () => void }) {
       <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500">
         <div className="flex items-center gap-3">
           <button onClick={onBack} className="text-white/80">&times;</button>
-          <div className="flex-1 text-white font-bold text-sm">&#128260; Review Mode</div>
+          <div className="flex-1 text-white font-bold text-sm">🔄 Review Mode</div>
           <span className="text-white/70 text-xs">{cur + 1}/{questions.length}</span>
         </div>
         <div className="flex items-center gap-2 mt-2 text-[10px] text-white/60">

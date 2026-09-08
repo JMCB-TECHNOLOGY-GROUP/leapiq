@@ -5,7 +5,7 @@ const client = new Anthropic();
 
 export async function POST(request: Request) {
   const { content, type, name, grade } = await request.json();
-  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['5th'];
+  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['grade6'];
 
   const msgContent: Anthropic.MessageParam['content'] = type === 'image'
     ? [

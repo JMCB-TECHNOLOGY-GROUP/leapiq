@@ -2,7 +2,8 @@ export interface Student {
   id: string;
   name: string;
   grade: string;
-  state: string;
+  /** Education district code, 1-11. */
+  district: string;
   created: string;
   avatar?: string;
 }

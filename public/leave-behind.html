@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>LeapIQ Leave-Behind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@300..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#F1F4EF; --surface:#FBFCFA; --surface-2:#E9EEE7;
+  --rule:#CFD8CB; --rule-soft:#E0E7DD;
+  --ink:#15201A; --ink-2:#354338; --muted:#69796D;
+  --accent:#00805F; --gold:#8A6A16; --crit:#A3372B;
+  --crit-bg:#F7E4E1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#0D1411; --surface:#131C18; --surface-2:#18231D;
+    --rule:#27352C; --rule-soft:#1E2A23;
+    --ink:#E7EDE8; --ink-2:#C2CFC5; --muted:#8B9C90;
+    --accent:#4FB79A; --gold:#D8AE4E; --crit:#E4776A;
+    --crit-bg:#351714;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#0D1411; --surface:#131C18; --surface-2:#18231D;
+  --rule:#27352C; --rule-soft:#1E2A23;
+  --ink:#E7EDE8; --ink-2:#C2CFC5; --muted:#8B9C90;
+  --accent:#4FB79A; --gold:#D8AE4E; --crit:#E4776A;
+  --crit-bg:#351714;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;
+  font-size:14.5px; line-height:1.5; -webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.sheet{max-width:860px; margin:0 auto; padding:34px 26px 50px}
+
+header{display:flex; align-items:flex-start; justify-content:space-between; gap:18px;
+  border-bottom:2px solid var(--ink); padding-bottom:14px; margin-bottom:16px}
+.brand{display:flex; align-items:center; gap:11px}
+.brand svg{flex:none}
+.bt{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--ink-2); font-weight:600; line-height:1.4}
+.bt small{display:block; color:var(--muted); letter-spacing:.09em; font-weight:500}
+.docid{font-family:"IBM Plex Mono",monospace; font-size:9.5px; color:var(--muted);
+  text-align:right; letter-spacing:.06em; line-height:1.6}
+
+h1{font-family:"Newsreader",Georgia,serif; font-weight:500;
+  font-size:clamp(26px,3.6vw,34px); line-height:1.08; letter-spacing:-.015em;
+  margin:0 0 7px; text-wrap:balance}
+.stand{font-size:15px; color:var(--ink-2); max-width:62ch; margin:0 0 16px}
+.stand b{color:var(--ink)}
+
+h2{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.17em;
+  text-transform:uppercase; color:var(--accent); font-weight:600;
+  margin:18px 0 8px; padding-bottom:5px; border-bottom:1px solid var(--rule)}
+
+/* pipeline — the four steps, numbered because they are a sequence */
+.pipe{display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule)}
+.pstep{background:var(--surface); display:grid; grid-template-columns:22px 1fr; gap:0 11px;
+  padding:8px 13px; align-items:baseline}
+.pstep .n{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600; color:var(--accent)}
+.pstep .t{font-size:13px; color:var(--ink-2)}
+.pstep .t b{color:var(--ink)}
+.tagline{font-family:"Newsreader",Georgia,serif; font-style:italic; font-size:14.5px;
+  color:var(--ink-2); margin:9px 0 0}
+
+/* numbers row */
+.figs{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule)}
+.fig{background:var(--surface); padding:11px 13px}
+.fig .n{font-family:"IBM Plex Mono",monospace; font-size:21px; font-weight:600;
+  letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums}
+.fig .n small{font-size:12px; color:var(--muted); font-weight:500}
+.fig .n.crit{color:var(--crit)}
+.fig .l{font-size:10.5px; color:var(--muted); margin-top:5px; line-height:1.4}
+
+.twocol{display:grid; grid-template-columns:1fr 1fr; gap:0 26px}
+@media (max-width:640px){.twocol{grid-template-columns:1fr}}
+ul.tick{margin:0; padding:0; list-style:none}
+ul.tick li{padding:3px 0 3px 16px; position:relative; font-size:12.5px; color:var(--ink-2)}
+ul.tick li::before{content:"—"; position:absolute; left:0; color:var(--accent); font-weight:600}
+ul.tick b{color:var(--ink)}
+
+.askbox{background:var(--surface); border:1px solid var(--rule); border-left:3px solid var(--accent);
+  padding:12px 16px; margin-top:2px}
+.askbox p{margin:0 0 7px; font-size:13px; color:var(--ink-2)}
+.askbox p:last-child{margin-bottom:0}
+.askbox b{color:var(--ink)}
+.month1{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--gold); font-weight:600}
+
+footer{margin-top:16px; padding-top:10px; border-top:2px solid var(--ink);
+  display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:baseline}
+.contact{font-size:12.5px; color:var(--ink-2)}
+.contact b{color:var(--ink)}
+.fine{font-size:9.5px; color:var(--muted); max-width:46ch; line-height:1.45}
+
+@media print{
+  @page{ margin:8.5mm 12mm; size:auto; }
+  :root{
+    --paper:#FFFFFF; --surface:#FFFFFF; --surface-2:#FFFFFF;
+    --ink:#000; --ink-2:#1c221e; --muted:#525b55;
+    --rule:#9aa79d; --rule-soft:#c8d2c9;
+    --accent:#00614A; --gold:#7a5c10; --crit:#8f2e23; --crit-bg:#fff;
+  }
+  body{background:#fff; font-size:9.6pt; line-height:1.36}
+  .sheet{max-width:none; padding:0}
+  header{padding-bottom:6px; margin-bottom:8px}
+  h1{font-size:17pt}
+  .stand{font-size:9.8pt; margin-bottom:7px}
+  h2{margin:8px 0 5px}
+  .pstep{padding:3px 10px}
+  .fig{padding:6px 10px}
+  .fig .n{font-size:13pt}
+  .figs,.pipe,.askbox{break-inside:avoid}
+  footer{margin-top:7px; padding-top:6px}
+}
+@media print{ body{zoom:.93} footer{flex-wrap:nowrap; align-items:flex-start} .fine{flex:1; max-width:none; font-size:7pt; line-height:1.35} .contact{flex:0 0 auto; font-size:8.6pt} .tagline{margin:5px 0 0;font-size:9.8pt} ul.tick li{padding:2px 0 2px 14px;font-size:9.2pt} .askbox{padding:8px 12px} .askbox p{margin:0 0 4px;font-size:9.4pt} .fine{font-size:7.4pt} .fig .l{font-size:8.3pt} .pstep .t{font-size:9.4pt} .docid{font-size:8pt} }
+</style>
+
+<div class="sheet">
+
+<header>
+  <div class="brand">
+    <svg width="40" height="40" viewBox="0 0 38 38" aria-hidden="true">
+      <rect x="0" y="0" width="38" height="38" rx="3" fill="#0F172A"/>
+      <rect x="0" y="0" width="38" height="3.4" fill="#C41E3A"/>
+      <text x="18.5" y="26.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.5" font-weight="800" fill="#F1F5F9" letter-spacing="0.5">JM</text>
+      <rect x="8" y="29.4" width="21" height="2.2" fill="#D4A017"/>
+    </svg>
+    <div class="bt">JMCB Technology Group<small>Prepared for the Ministry of Education, Guyana</small></div>
+  </div>
+  <div class="docid">LeapIQ · one page<br>September 2026 · draft for discussion</div>
+</header>
+
+<h1>Seeing every child in time to act</h1>
+<p class="stand">The Ministry cannot currently see <b>which child</b> is behind, in <b>which strand</b>, in <b>which region</b>, until the national assessment says so — at Grade&nbsp;Six, for a problem that usually began in Grade&nbsp;One. LeapIQ is the national instrument that closes that gap between what is happening in classrooms and what the Ministry can see and act on.</p>
+
+<h2>How it works — with the materials the Ministry already has</h2>
+<div class="pipe">
+  <div class="pstep"><span class="n">1</span><span class="t"><b>A mark sheet is imported</b> — any test the school already gives, read row by row; anything unreadable is reported, never silently dropped.</span></div>
+  <div class="pstep"><span class="n">2</span><span class="t"><b>Scores become a baseline for every curriculum strand</b> — not one mark for Mathematics, a number for Number Concepts and a different one for Geometry.</span></div>
+  <div class="pstep"><span class="n">3</span><span class="t"><b>Strands below expectation become an individual plan</b> — measurable goals that pull modules from pre-loaded national class materials for every grade, reaching back to earlier years so each child is taught at the level the evidence shows, not the level they are enrolled in.</span></div>
+  <div class="pstep"><span class="n">4</span><span class="t"><b>Every piece of work updates the plan</b> — and rolls up, from the child to the class to the school to the district to the Ministry, nightly.</span></div>
+</div>
+<p class="tagline">Nobody types a report. The work is the report.</p>
+
+<h2>The gap, in the Ministry's own structure — demonstration figures</h2>
+<div class="figs">
+  <div class="fig"><div class="n crit">21.8<small> pts</small></div><div class="l">Coast–hinterland mastery gap across Regions 1, 7, 8 and 9</div></div>
+  <div class="fig"><div class="n crit">≈6,000</div><div class="l">Hinterland children below expectation who would be at it under coastal conditions</div></div>
+  <div class="fig"><div class="n">14.5<small> yrs</small></div><div class="l">To parity at today's closing rate — longer than the 13-year school career of a child starting nursery now</div></div>
+  <div class="fig"><div class="n">US$0.80</div><div class="l">Per learner per year to run the platform at national scale, after handover</div></div>
+</div>
+
+<div class="twocol">
+  <div>
+    <h2>Built for Guyana's real constraints</h2>
+    <ul class="tick">
+      <li><b>Offline-first:</b> a school with no connection for a full term loses nothing — the plan engine runs on the device.</li>
+      <li><b>Child-safe by construction:</b> no email identities for children; a data-protection impact assessment signed before any pupil record moves.</li>
+      <li><b>NCERD owns the curriculum:</b> the platform loads the Ministry's strands and objectives as versioned content, and every AI-generated practice item is reviewed by a Guyanese teacher before it reaches a child.</li>
+      <li><b>Teachers are the rollout:</b> cascade training led by serving Guyanese master trainers; the teacher receives a ranked list of who to sit with — never another system to feed.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>The programme</h2>
+    <ul class="tick">
+      <li><b>US$7.5M over five years</b>, total cost of ownership — 0.26% of the 2026 education budget in its peak year.</li>
+      <li><b>National primary coverage inside 12 months:</b> all 436 primary schools, 50,000 pupils in Grades 4–6.</li>
+      <li><b>All 1,155 public schools by month 30</b>, Nursery 1 to Form 5, with handover to Ministry operation beginning at month 22.</li>
+      <li><b>Every phase ends with a result the Ministry can verify</b> — and none commits the country to the next.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>What we propose today</h2>
+<div class="askbox">
+  <p><b>A pilot, not a programme:</b> forty schools across four districts — two coastal, two hinterland — for five months, measured against a matched comparison group, with a decision point at month seven that the Ministry controls. If it does not show a lift, it stops, and it costs the pilot rather than the programme.</p>
+  <p><span class="month1">Needed in month one</span> &nbsp;·&nbsp; the NCERD curriculum guides with official objective numbering &nbsp;·&nbsp; a school census extract &nbsp;·&nbsp; a data-sharing agreement and DPIA sign-off. None of the three costs money.</p>
+</div>
+
+<footer>
+  <div class="contact"><b>Jermaine Barker</b> · Founder &amp; CEO, JMCB Technology Group<br>
+  jermaine@jmcbtech.com · (301) 283-8535 · jmcbtech.com · demonstration: <b>moe.jmcbtech.com</b></div>
+  <div class="fine">Gap figures are demonstration data derived from the platform's illustrative dashboard, shown to illustrate the reporting; they are not Ministry statistics, and Ministry data replaces them in Phase 0. Cost figures are a model, restated against Ministry data during Phase 0. Confidential — prepared for the Ministry of Education, Guyana.</div>
+</footer>
+
+</div>
+
+</html>

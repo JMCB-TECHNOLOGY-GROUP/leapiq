@@ -11,8 +11,8 @@ export default function Tutor({ subject, onBack }: {
 }) {
   const { user } = useApp();
   const name = user?.name || 'Student';
-  const grade = user?.grade || '5th';
-  const state = user?.state || 'DC';
+  const grade = user?.grade || 'grade6';
+  const district = user?.district || '4';
   const subj = SUBJECTS.find(s => s.id === subject);
 
   const [msgs, setMsgs] = useState<ChatMessage[]>([]);
@@ -20,7 +20,10 @@ export default function Tutor({ subject, onBack }: {
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // The greeting names the pupil, who is only known after the provider has
+  // hydrated from localStorage, so this cannot come from lazy initial state.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- greeting depends on post-mount user
     setMsgs([{
       role: 'assistant',
       content: `Hey ${name}! I'm your ${subj?.name} tutor.\n\nAsk me anything! For example:\n• "Explain fractions like I'm 10"\n• "Why did the Aztecs fall?"\n• "Help me with photosynthesis"\n• "Quiz me on grammar"\n\nWhat do you want to work on?`
@@ -47,7 +50,7 @@ export default function Tutor({ subject, onBack }: {
           subject,
           name,
           grade,
-          state,
+          district,
         }),
       });
       const data = await res.json();
@@ -63,7 +66,7 @@ export default function Tutor({ subject, onBack }: {
       {/* Header */}
       <div className={`bg-gradient-to-r ${subj?.gradient} px-4 py-3 flex items-center gap-3`}>
         <button onClick={onBack} className="text-white/80">&larr;</button>
-        <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">&#129302;</div>
+        <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
         <div>
           <div className="text-white font-bold text-sm">{subj?.name} Tutor</div>
           <div className="text-white/50 text-[10px]">Ask me anything</div>
