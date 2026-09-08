@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/app-context';
-import { GRADE_OPTIONS, STATES } from '@/lib/constants';
+import { GRADE_OPTIONS, EDUCATION_DISTRICTS } from '@/lib/constants';
 import type { Student } from '@/lib/types';
 
 export default function StudentLogin({ onSelect, onBack }: {
@@ -11,7 +11,7 @@ export default function StudentLogin({ onSelect, onBack }: {
 }) {
   const { students, addStudent } = useApp();
   const [name, setName] = useState('');
-  const [grade, setGrade] = useState('5th');
+  const [grade, setGrade] = useState('grade6');
   const [usState, setUsState] = useState('DC');
   const [adding, setAdding] = useState(false);
 
@@ -57,7 +57,7 @@ export default function StudentLogin({ onSelect, onBack }: {
               </select>
               <select value={usState} onChange={e => setUsState(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-3 focus:outline-none focus:border-blue-400 text-sm">
                 <option value="">Select State</option>
-                {STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                {EDUCATION_DISTRICTS.map(d => <option key={d.code} value={d.code}>{d.region} — {d.name}</option>)}
               </select>
               <div className="flex gap-2">
                 <button onClick={() => setAdding(false)} className="flex-1 py-2 text-gray-400 font-semibold">Cancel</button>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/app-context';
-import { SUBJECTS, GRADE_CONFIG, STATES, STANDARDS_MAP } from '@/lib/constants';
+import { SUBJECTS, GRADE_CONFIG, STANDARDS_MAP } from '@/lib/constants';
 import { getSubjectPerformance, identifyGaps, calculateVelocity } from '@/lib/adaptive-engine';
 import { getMasteredCount, getLearningCount } from '@/lib/storage';
 import { summarisePlan } from '@/lib/iep-progress';
@@ -48,7 +48,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
       <div className="min-h-screen bg-gray-50 pb-8">
         <div className="bg-indigo-700 px-5 py-4 flex items-center gap-3">
           <button onClick={() => setView('overview')} className="text-white/80">&larr;</button>
-          <h1 className="text-white font-black flex-1">Standards Alignment</h1>
+          <h1 className="text-white font-black flex-1">Curriculum Alignment</h1>
         </div>
         <div className="px-5 pt-4">
           <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
@@ -150,7 +150,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
         <div className="bg-indigo-700 px-5 py-4 flex items-center gap-3">
           <button onClick={() => { setView('overview'); setSelectedStudent(null); }} className="text-white/80">&larr;</button>
           <h1 className="text-white font-black flex-1">{student?.name}</h1>
-          <span className="text-white/60 text-xs">{GRADE_CONFIG[student?.grade || '5th']?.label}</span>
+          <span className="text-white/60 text-xs">{GRADE_CONFIG[student?.grade || 'grade6']?.label}</span>
         </div>
         <div className="px-5 pt-4">
           {plans.some(p => p.studentId === selectedStudent) && (
@@ -228,7 +228,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
           <span className="text-xl">&#128203;</span>
           <div className="text-left">
             <div className="font-semibold text-sm text-gray-900">Standards Alignment</div>
-            <div className="text-gray-400 text-[11px]">View Common Core mastery by category</div>
+            <div className="text-gray-400 text-[11px]">Mastery by curriculum strand</div>
           </div>
           <span className="text-gray-300 ml-auto">&rarr;</span>
         </button>

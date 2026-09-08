@@ -11,8 +11,8 @@ export default function Tutor({ subject, onBack }: {
 }) {
   const { user } = useApp();
   const name = user?.name || 'Student';
-  const grade = user?.grade || '5th';
-  const state = user?.state || 'DC';
+  const grade = user?.grade || 'grade6';
+  const district = user?.district || '4';
   const subj = SUBJECTS.find(s => s.id === subject);
 
   const [msgs, setMsgs] = useState<ChatMessage[]>([]);
@@ -47,7 +47,7 @@ export default function Tutor({ subject, onBack }: {
           subject,
           name,
           grade,
-          state,
+          district,
         }),
       });
       const data = await res.json();

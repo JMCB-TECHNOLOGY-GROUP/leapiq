@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     return Response.json({ gaps: [], learningPath: [], summary: 'Not enough data yet. Complete a few quizzes to get personalized insights!' });
   }
 
-  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['5th'];
+  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['grade6'];
 
   // Aggregate performance data
   const categoryPerformance: Record<string, { correct: number; total: number; bloom: string[] }> = {};

@@ -19,9 +19,9 @@ function record(over: Partial<AssessmentRecord> = {}): AssessmentRecord {
     id: over.id ?? `a_${Math.random()}`,
     studentRef: 'G6-001',
     studentName: 'Anaya Persaud',
-    grade: '6th',
+    grade: 'grade6',
     subject: 'math',
-    strand: 'Number & Operations',
+    strand: 'Number Concepts',
     assessment: 'Term 1 Diagnostic',
     date: '2026-01-14',
     score: 12,
@@ -37,7 +37,7 @@ function setUp(percent = 30): { plan: IEP; assignments: ModuleAssignment[] } {
   const profile = buildBaselineProfile([record({ percent })], {
     studentId: 'stu_1',
     studentName: 'Anaya Persaud',
-    grade: '6th',
+    grade: 'grade6',
   });
   const plan = buildIEP(profile);
   return { plan, assignments: createAssignments(plan) };
@@ -194,10 +194,10 @@ describe('applySessionResults', () => {
       total: 4,
       xp: 30,
       questions: [
-        { id: 'q1', correct: true, bloom: 'apply', category: 'Number & Operations' },
-        { id: 'q2', correct: true, bloom: 'apply', category: 'Number & Operations' },
-        { id: 'q3', correct: true, bloom: 'apply', category: 'Number & Operations' },
-        { id: 'q4', correct: false, bloom: 'apply', category: 'Number & Operations' },
+        { id: 'q1', correct: true, bloom: 'apply', category: 'Number Concepts' },
+        { id: 'q2', correct: true, bloom: 'apply', category: 'Number Concepts' },
+        { id: 'q3', correct: true, bloom: 'apply', category: 'Number Concepts' },
+        { id: 'q4', correct: false, bloom: 'apply', category: 'Number Concepts' },
       ],
       ...over,
     };
@@ -214,7 +214,7 @@ describe('applySessionResults', () => {
 
   it('ignores a quiz in a subject the plan does not cover', () => {
     const { plan, assignments } = setUp();
-    expect(applySessionResults(plan, assignments, session({ subject: 'history' }))).toBe(plan);
+    expect(applySessionResults(plan, assignments, session({ subject: 'social' }))).toBe(plan);
   });
 
   it('ignores a quiz whose categories match no goal', () => {

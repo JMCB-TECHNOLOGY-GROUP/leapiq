@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useApp } from '@/lib/app-context';
-import { SUBJECTS, GRADE_CONFIG, GRADE_OPTIONS, STATES } from '@/lib/constants';
+import { SUBJECTS, GRADE_CONFIG, GRADE_OPTIONS, EDUCATION_DISTRICTS } from '@/lib/constants';
 import { getDueQuestions, getMasteredCount, getLearningCount } from '@/lib/storage';
 import { getSubjectPerformance, identifyGaps, calculateVelocity } from '@/lib/adaptive-engine';
 import ProgressCharts from './ProgressCharts';
@@ -12,7 +12,7 @@ export default function ParentDashboard({ onLogout }: { onLogout: () => void }) 
   const [expanded, setExpanded] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newGrade, setNewGrade] = useState('5th');
+  const [newGrade, setNewGrade] = useState('grade6');
   const [newState, setNewState] = useState('DC');
   const [showCharts, setShowCharts] = useState<string | null>(null);
   const [gapAnalysis, setGapAnalysis] = useState<Record<string, { summary: string; gaps: { category: string; accuracy: number; severity: string; recommendation: string }[]; loading: boolean }>>({});
@@ -91,7 +91,7 @@ export default function ParentDashboard({ onLogout }: { onLogout: () => void }) 
                 <div className="flex-1">
                   <div className="font-bold text-gray-900 text-sm">{s.name}</div>
                   <div className="text-[10px] text-gray-400">
-                    {GRADE_CONFIG[s.grade]?.label || s.grade} &middot; {STATES.find(x => x.code === s.state)?.name || ''} &middot; {ss.length} sessions &middot; {xp} XP
+                    {GRADE_CONFIG[s.grade]?.label || s.grade} &middot; {EDUCATION_DISTRICTS.find(d => d.code === s.district)?.name || ''} &middot; {ss.length} sessions &middot; {xp} XP
                   </div>
                 </div>
                 <span className={`text-gray-400 transition-transform ${open ? 'rotate-90' : ''}`}>&rsaquo;</span>
@@ -222,7 +222,7 @@ export default function ParentDashboard({ onLogout }: { onLogout: () => void }) 
               {GRADE_OPTIONS.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
             </select>
             <select value={newState} onChange={e => setNewState(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-3 text-sm">
-              {STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+              {EDUCATION_DISTRICTS.map(d => <option key={d.code} value={d.code}>{d.region} — {d.name}</option>)}
             </select>
             <div className="flex gap-2">
               <button onClick={() => setAdding(false)} className="flex-1 py-2 text-gray-400 font-semibold text-sm">Cancel</button>

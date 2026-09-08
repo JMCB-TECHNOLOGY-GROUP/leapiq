@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/lib/app-context';
 import { GRADE_CONFIG, SUBJECTS } from '@/lib/constants';
+import { GRADE_ORDER } from '@/data/guyana';
 import { getModule } from '@/data/curriculum';
 import {
   MASTERY_THRESHOLD,
@@ -69,11 +70,14 @@ function ModuleRow({
   assignment,
   isNext,
   readOnly,
+  planGrade,
   onRecord,
 }: {
   assignment: ModuleAssignment;
   isNext: boolean;
   readOnly: boolean;
+  /** The pupil's enrolled year, so earlier-year material can be marked as such. */
+  planGrade: string;
   onRecord: (percent: number) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -96,7 +100,17 @@ function ModuleRow({
           {assignment.status === 'mastered' ? '✓' : mod?.sequence ?? '?'}
         </span>
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-bold text-gray-900 truncate">{mod?.title ?? assignment.moduleId}</div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold text-gray-900 truncate">{mod?.title ?? assignment.moduleId}</span>
+            {mod && GRADE_ORDER.indexOf(mod.grade) < GRADE_ORDER.indexOf(planGrade) && (
+              <span
+                className="text-[9px] font-bold bg-amber-100 text-amber-700 rounded px-1.5 py-0.5 flex-shrink-0"
+                title="Earlier-year material, assigned because the pupil is working below their enrolled year"
+              >
+                {GRADE_CONFIG[mod.grade]?.short ?? mod.grade}
+              </span>
+            )}
+          </div>
           <div className="text-[10px] text-gray-400 truncate">
             {mod ? `${mod.minutes} min · ${mod.materials.lessons} lessons · ${mod.materials.practice} practice` : 'Module not in catalogue'}
             {assignment.attempts > 0 && ` · best ${assignment.bestPercent}%`}
@@ -276,6 +290,7 @@ export default function PlanView({ studentId, onBack, readOnly = false }: {
                     assignment={a}
                     isNext={next?.id === a.id}
                     readOnly={readOnly}
+                    planGrade={plan.grade}
                     onRecord={percent =>
                       recordMastery(plan.id, {
                         moduleId: a.moduleId,

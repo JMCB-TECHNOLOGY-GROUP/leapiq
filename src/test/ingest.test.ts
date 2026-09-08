@@ -54,25 +54,33 @@ describe('normalisers', () => {
   it('maps subject synonyms onto taught subjects', () => {
     expect(normaliseSubject('Mathematics')).toBe('math');
     expect(normaliseSubject('numeracy')).toBe('math');
-    expect(normaliseSubject('Social Studies')).toBe('history');
+    expect(normaliseSubject('Social Studies')).toBe('social');
     expect(normaliseSubject('Music')).toBeNull();
   });
 
-  it('normalises grade labels', () => {
-    expect(normaliseGrade('6')).toBe('6th');
-    expect(normaliseGrade('Grade 6')).toBe('6th');
-    expect(normaliseGrade('Pre-K')).toBe('prek');
-    expect(normaliseGrade('Kindergarten')).toBe('k');
+  it('normalises Guyanese grade labels', () => {
+    expect(normaliseGrade('6')).toBe('grade6');
+    expect(normaliseGrade('Grade 6')).toBe('grade6');
+    expect(normaliseGrade('Nursery 2')).toBe('nursery2');
+    expect(normaliseGrade('N1')).toBe('nursery1');
     expect(normaliseGrade('sixth')).toBeNull();
   });
 
+  it('reads a secondary year written either as a form or as a grade', () => {
+    expect(normaliseGrade('Form 3')).toBe('form3');
+    expect(normaliseGrade('F3')).toBe('form3');
+    // Guyana numbers the secondary years 7-11 as well as Forms 1-5.
+    expect(normaliseGrade('Grade 9')).toBe('form3');
+    expect(normaliseGrade('11')).toBe('form5');
+  });
+
   it('snaps a loosely spelled strand onto a taught one', () => {
-    expect(normaliseStrand('Number Operations', 'math', '6th')).toBe('Number & Operations');
-    expect(normaliseStrand('number & operations', 'math', '6th')).toBe('Number & Operations');
+    expect(normaliseStrand('Number Operations', 'math', 'grade6')).toBe('Number Concepts');
+    expect(normaliseStrand('number concepts', 'math', 'grade6')).toBe('Number Concepts');
   });
 
   it('keeps an unrecognised strand rather than discarding the row', () => {
-    expect(normaliseStrand('Mental Arithmetic', 'math', '6th')).toBe('Mental Arithmetic');
+    expect(normaliseStrand('Mental Arithmetic', 'math', 'grade6')).toBe('Mental Arithmetic');
   });
 });
 
@@ -84,7 +92,7 @@ describe('ingestAssessments', () => {
     expect(result.accepted).toBe(1);
     expect(result.records[0].percent).toBe(75);
     expect(result.records[0].subject).toBe('math');
-    expect(result.records[0].grade).toBe('6th');
+    expect(result.records[0].grade).toBe('grade6');
   });
 
   it('prefers an explicit percent column over marks', () => {
@@ -116,9 +124,9 @@ describe('ingestAssessments', () => {
   it('falls back to the default grade and warns', () => {
     const result = ingestAssessments(
       `${header}\nG1,Ann,Senior Phase,Math,Geometry,Test,2026-01-14,30,40`,
-      { defaultGrade: '6th' },
+      { defaultGrade: 'grade6' },
     );
-    expect(result.records[0].grade).toBe('6th');
+    expect(result.records[0].grade).toBe('grade6');
     expect(result.issues.some(i => i.field === 'grade' && i.severity === 'warning')).toBe(true);
   });
 
@@ -164,7 +172,7 @@ describe('the shipped sample mark sheet', () => {
     expect(result.issues.some(i => i.field === 'maxScore')).toBe(true);
     expect(result.records.some(r => r.date === '2026-02-14')).toBe(true);
     expect(
-      result.records.filter(r => r.studentName === 'Anaya Persaud' && r.strand === 'Number & Operations'),
+      result.records.filter(r => r.studentName === 'Anaya Persaud' && r.strand === 'Number Concepts'),
     ).toHaveLength(2);
   });
 

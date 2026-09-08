@@ -1,7 +1,7 @@
 'use client';
 
 import { useApp } from '@/lib/app-context';
-import { SUBJECTS, GRADE_CONFIG, STATES } from '@/lib/constants';
+import { SUBJECTS, GRADE_CONFIG, EDUCATION_DISTRICTS } from '@/lib/constants';
 import { getDueQuestions } from '@/lib/storage';
 import { getSubjectPerformance, identifyGaps, calculateVelocity } from '@/lib/adaptive-engine';
 import { activeQueue, summarisePlan } from '@/lib/iep-progress';
@@ -22,8 +22,8 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
   const totalXP = studentSessions.reduce((s, p) => s + (p.xp || 0), 0);
   const dueCount = getDueQuestions(user.id).length;
   const today = studentSessions.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).length;
-  const gc = GRADE_CONFIG[user.grade] || GRADE_CONFIG['5th'];
-  const stateName = STATES.find(s => s.code === user.state)?.name || '';
+  const gc = GRADE_CONFIG[user.grade] || GRADE_CONFIG['grade6'];
+  const districtName = EDUCATION_DISTRICTS.find(d => d.code === user.district)?.name || '';
   const gaps = identifyGaps(studentSessions);
   const velocity = calculateVelocity(studentSessions);
   const plan = getPlanForStudent(user.id);
@@ -44,7 +44,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
             <div>
               <p className="text-blue-200 text-xs">Welcome back</p>
               <h1 className="text-2xl font-black text-white">{user.name}</h1>
-              <p className="text-blue-200/60 text-[10px]">{gc.label} &middot; {stateName}</p>
+              <p className="text-blue-200/60 text-[10px]">{gc.label} &middot; {districtName}</p>
             </div>
             <button onClick={onLogout} className="text-blue-200 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
           </div>

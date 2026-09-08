@@ -1,5 +1,5 @@
-import { GRADE_ORDER } from '@/data/curriculum';
 import { strandsForGrade } from '@/data/curriculum';
+import { GRADE_ORDER } from '@/data/guyana';
 import type {
   AssessmentRecord,
   ColumnMapping,
@@ -122,10 +122,13 @@ export function detectColumns(headers: string[]): ColumnMapping {
 
 const SUBJECT_ALIASES: Record<string, string> = {
   math: 'math', maths: 'math', mathematics: 'math', numeracy: 'math', arithmetic: 'math',
-  english: 'english', ela: 'english', 'english language arts': 'english', 'language arts': 'english',
-  literacy: 'english', reading: 'english', writing: 'english',
-  science: 'science', 'general science': 'science', biology: 'science', physics: 'science', chemistry: 'science',
-  history: 'history', 'social studies': 'history', 'social science': 'history', geography: 'history', civics: 'history',
+  english: 'english', 'english language': 'english', 'english a': 'english', ela: 'english',
+  'english language arts': 'english', 'language arts': 'english', literacy: 'english',
+  reading: 'english', writing: 'english', comprehension: 'english',
+  science: 'science', 'general science': 'science', 'integrated science': 'science',
+  'natural science': 'science', biology: 'science', physics: 'science', chemistry: 'science',
+  social: 'social', 'social studies': 'social', 'social science': 'social',
+  history: 'social', geography: 'social', civics: 'social',
 };
 
 export function normaliseSubject(raw: string): string | null {
@@ -134,21 +137,36 @@ export function normaliseSubject(raw: string): string | null {
   return SUBJECT_ALIASES[key] ?? null;
 }
 
+/**
+ * Map a school's grade label onto a Guyanese year of schooling.
+ *
+ * Schools write the same year several ways: "Form 3", "F3" and "Grade 9" are
+ * all the third year of secondary, and nursery appears as "N1", "Nursery 1" or
+ * "Nursery Year 1".
+ */
 export function normaliseGrade(raw: string): string | null {
-  const key = raw.trim().toLowerCase();
+  const key = raw.trim().toLowerCase().replace(/\s+/g, ' ');
   if (!key) return null;
-  if (GRADE_ORDER.includes(key)) return key;
-  if (/^(pre-?k|pk|nursery|preschool)$/.test(key)) return 'prek';
-  if (/^(k|kg|kindergarten|reception)$/.test(key)) return 'k';
-  if (/^(college|university|tertiary|undergrad\w*)$/.test(key)) return 'college';
+  if (GRADE_ORDER.includes(key.replace(/ /g, ''))) return key.replace(/ /g, '');
 
   const num = key.match(/(\d{1,2})/);
-  if (num) {
-    const n = parseInt(num[1], 10);
-    if (n >= 1 && n <= 12) {
-      const suffix = n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th';
-      return `${n}${suffix}`;
-    }
+  const n = num ? parseInt(num[1], 10) : null;
+
+  // Nursery: N1/N2, "nursery 2", "nursery year 1". Bare "nursery" starts at year 1.
+  if (/nursery|pre-?school|^n ?\d$/.test(key)) {
+    return n === 2 ? 'nursery2' : 'nursery1';
+  }
+
+  // Secondary: "Form 3", "F3", "third form".
+  if (/form|^f ?\d$/.test(key)) {
+    if (n !== null && n >= 1 && n <= 5) return `form${n}`;
+    return null;
+  }
+
+  // Primary and the secondary years written as grades 7-11.
+  if (n !== null) {
+    if (n >= 1 && n <= 6) return `grade${n}`;
+    if (n >= 7 && n <= 11) return `form${n - 6}`;
   }
   return null;
 }

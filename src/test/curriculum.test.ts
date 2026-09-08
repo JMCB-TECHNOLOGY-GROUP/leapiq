@@ -6,6 +6,7 @@ import {
   getModule,
   modulesForGrade,
   modulesForStrand,
+  strandPathway,
   strandsForGrade,
 } from '@/data/curriculum';
 import { GRADE_CONFIG } from '@/lib/constants';
@@ -91,20 +92,20 @@ describe('strand sequencing', () => {
   });
 
   it('chains the first module of a strand back to the previous grade', () => {
-    const first = modulesForStrand('6th', 'math', 'Number & Operations')[0];
+    const first = modulesForStrand('grade6', 'math', 'Number Concepts')[0];
     expect(first.prerequisiteIds).toHaveLength(1);
-    expect(getModule(first.prerequisiteIds[0])!.grade).toBe('5th');
+    expect(getModule(first.prerequisiteIds[0])!.grade).toBe('grade5');
   });
 
   it('is deterministic across calls', () => {
-    expect(modulesForStrand('6th', 'math', 'Geometry').map(m => m.id))
-      .toEqual(modulesForStrand('6th', 'math', 'Geometry').map(m => m.id));
+    expect(modulesForStrand('grade6', 'math', 'Geometry').map(m => m.id))
+      .toEqual(modulesForStrand('grade6', 'math', 'Geometry').map(m => m.id));
   });
 });
 
 describe('lookups', () => {
   it('returns nothing for a strand that grade does not teach', () => {
-    expect(modulesForStrand('6th', 'math', 'Mental Arithmetic')).toEqual([]);
+    expect(modulesForStrand('grade6', 'math', 'Mental Arithmetic')).toEqual([]);
   });
 
   it('returns undefined for an unknown module id', () => {
@@ -112,7 +113,7 @@ describe('lookups', () => {
   });
 
   it('lists each strand of a grade once', () => {
-    const strands = strandsForGrade('6th').map(s => `${s.subject}::${s.strand}`);
+    const strands = strandsForGrade('grade6').map(s => `${s.subject}::${s.strand}`);
     expect(new Set(strands).size).toBe(strands.length);
   });
 
@@ -124,5 +125,45 @@ describe('lookups', () => {
       expect(row.subjects).toBeGreaterThan(0);
       expect(row.minutes).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('strandPathway', () => {
+  it('runs from earlier years up to the pupil’s own year', () => {
+    const pathway = strandPathway('grade6', 'math', 'Number Concepts');
+    expect(pathway.length).toBeGreaterThan(1);
+    const ranks = pathway.map(m => GRADE_ORDER.indexOf(m.grade));
+    expect([...ranks].sort((a, b) => a - b)).toEqual(ranks);
+    expect(pathway.at(-1)!.grade).toBe('grade6');
+  });
+
+  it('never teaches the same lesson twice, even when it spans years', () => {
+    for (const grade of GRADE_ORDER) {
+      for (const { subject, strand } of strandsForGrade(grade)) {
+        const titles = strandPathway(grade, subject, strand).map(m => m.title);
+        expect(new Set(titles).size).toBe(titles.length);
+      }
+    }
+  });
+
+  it('meets a lesson at the earliest year it is taught', () => {
+    const pathway = strandPathway('grade6', 'math', 'Number Concepts');
+    const factors = pathway.find(m => m.title.startsWith('Factors'));
+    expect(factors?.grade).toBe('grade4');
+  });
+
+  it('never reaches beyond the pupil’s own year', () => {
+    for (const grade of GRADE_ORDER) {
+      for (const { subject, strand } of strandsForGrade(grade)) {
+        for (const mod of strandPathway(grade, subject, strand)) {
+          expect(GRADE_ORDER.indexOf(mod.grade)).toBeLessThanOrEqual(GRADE_ORDER.indexOf(grade));
+        }
+      }
+    }
+  });
+
+  it('returns nothing for a strand that is not taught', () => {
+    expect(strandPathway('grade6', 'math', 'Mental Arithmetic')).toEqual([]);
+    expect(strandPathway('not-a-grade', 'math', 'Geometry')).toEqual([]);
   });
 });

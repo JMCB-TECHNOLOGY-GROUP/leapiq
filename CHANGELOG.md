@@ -28,11 +28,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`data/sample-marksheet.ts`)
 - Assessment Intake and Learning Plan screens, Class Materials coverage view in the
   educator dashboard, and a plan summary with up-next modules on the student dashboard
-- 97 tests covering the pipeline, including an end-to-end pass from imported scores to
+- 108 tests covering the pipeline, including an end-to-end pass from imported scores to
   a met goal
+
+- Guyana's education structure as first-class data: Nursery 1 to Form 5 with the
+  national assessment each year sits, and the eleven education districts with the four
+  hinterland regions flagged (`data/guyana.ts`)
+- Teaching pathways: a goal draws modules from up to two years below the pupil's own
+  year, deduplicated across years, so a plan teaches at the instructional level rather
+  than the enrolled level. Earlier-year modules are badged with their year in the plan
 
 ### Changed
 
+- **Scoped the platform to the Ministry of Education, Guyana.** Grades are Nursery 1 to
+  Form 5 instead of Pre-K to College; the 50-state list is replaced by the eleven
+  education districts; Social Studies replaces US History as the fourth core subject;
+  and every strand, question category and curriculum reference now follows the Guyana
+  National Curriculum guides published by NCERD instead of Common Core and NGSS
+- Learner records carry `district` rather than `state`
+- AI question generation is pinned to the Guyanese curriculum: it receives the valid
+  strand list for the subject so generated questions roll into the matching plan goal,
+  and is instructed to use Guyanese context, metric units and Guyana dollars
+- The AI tutor addresses pupils in a Guyanese setting and references the national
+  assessment they are working toward
 - `recordSession` folds completed quizzes into the pupil's plan, so practice keeps the
   plan current without a separate step
 

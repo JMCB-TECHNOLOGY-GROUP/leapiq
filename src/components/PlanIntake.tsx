@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 import { useApp } from '@/lib/app-context';
-import { GRADE_OPTIONS, STATES, SUBJECTS } from '@/lib/constants';
+import { GRADE_OPTIONS, EDUCATION_DISTRICTS, SUBJECTS } from '@/lib/constants';
 import { ingestAssessments, groupByStudent } from '@/lib/ingest';
 import { buildBaselineProfile } from '@/lib/baseline';
 import { buildIEP, uncoveredStrands } from '@/lib/iep-builder';
@@ -33,8 +33,8 @@ export default function PlanIntake({ onBack, onOpenPlan }: {
   const [step, setStep] = useState<Step>('input');
   const [text, setText] = useState('');
   const [sourceName, setSourceName] = useState('pasted data');
-  const [defaultGrade, setDefaultGrade] = useState('6th');
-  const [stateCode, setStateCode] = useState('DC');
+  const [defaultGrade, setDefaultGrade] = useState('grade6');
+  const [stateCode, setStateCode] = useState('4');
   const [result, setResult] = useState<IngestResult | null>(null);
   const [imported, setImported] = useState<AssessmentRecord[]>([]);
   const [created, setCreated] = useState<Record<string, string>>({});
@@ -135,7 +135,7 @@ export default function PlanIntake({ onBack, onOpenPlan }: {
                 onChange={e => setStateCode(e.target.value)}
                 className="mt-1 w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white"
               >
-                {STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+                {EDUCATION_DISTRICTS.map(d => <option key={d.code} value={d.code}>{d.region} — {d.name}</option>)}
               </select>
             </label>
           </div>
@@ -348,7 +348,7 @@ export default function PlanIntake({ onBack, onOpenPlan }: {
 
               {uncovered.length > 0 && (
                 <p className="text-[10px] text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5 mt-3">
-                  No {entry.profile.grade} modules exist yet for {uncovered.map(u => u.strand).join(', ')}.
+                  No modules exist yet on the teaching pathway for {uncovered.map(u => u.strand).join(', ')}.
                   These are reported in present levels but cannot carry a goal until materials are added.
                 </p>
               )}

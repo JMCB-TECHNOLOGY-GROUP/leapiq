@@ -39,12 +39,12 @@ export function saveStudents(students: Student[]): void {
   set('students', students);
 }
 
-export function addStudent(name: string, grade: string, state: string): Student {
+export function addStudent(name: string, grade: string, district: string): Student {
   const student: Student = {
     id: 'stu_' + Date.now(),
     name,
     grade,
-    state,
+    district,
     created: new Date().toISOString(),
   };
   const students = getStudents();

@@ -59,7 +59,7 @@ export default function Home() {
     return (
       <ParentLogin
         onSuccess={() => {
-          login({ id: 'parent', name: 'Parent', grade: '', state: '', created: '', role: 'parent' });
+          login({ id: 'parent', name: 'Parent', grade: '', district: '', created: '', role: 'parent' });
           setScreen('par-dash');
         }}
         onBack={() => setScreen('landing')}
@@ -71,7 +71,7 @@ export default function Home() {
     return (
       <EducatorLogin
         onSuccess={() => {
-          login({ id: 'educator', name: 'Educator', grade: '', state: '', created: '', role: 'educator' });
+          login({ id: 'educator', name: 'Educator', grade: '', district: '', created: '', role: 'educator' });
           setScreen('edu-dash');
         }}
         onBack={() => setScreen('landing')}

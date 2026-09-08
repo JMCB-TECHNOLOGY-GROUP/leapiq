@@ -1,4 +1,5 @@
 import { getModule } from '@/data/curriculum';
+import { GRADE_ORDER } from '@/data/guyana';
 import type {
   GoalProgressPoint,
   GoalStatus,
@@ -44,11 +45,18 @@ export function createAssignments(plan: IEP, now: Date = new Date()): ModuleAssi
   );
 }
 
-/** Assignments for a goal in teaching order. */
+/**
+ * Assignments for a goal in teaching order. A goal's modules can span several
+ * years — a pupil below expectation works up through earlier grades first — so
+ * the order is grade first, then position within that grade's strand.
+ */
 export function assignmentsForGoal(assignments: ModuleAssignment[], goalId: string): ModuleAssignment[] {
-  return assignments
-    .filter(a => a.goalId === goalId)
-    .sort((a, b) => (getModule(a.moduleId)?.sequence ?? 0) - (getModule(b.moduleId)?.sequence ?? 0));
+  const rank = (id: string) => {
+    const mod = getModule(id);
+    if (!mod) return Number.MAX_SAFE_INTEGER;
+    return GRADE_ORDER.indexOf(mod.grade) * 1000 + mod.sequence;
+  };
+  return assignments.filter(a => a.goalId === goalId).sort((a, b) => rank(a.moduleId) - rank(b.moduleId));
 }
 
 /** The module a pupil should work on next for a goal: earliest not yet mastered. */

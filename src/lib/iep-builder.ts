@@ -1,4 +1,4 @@
-import { modulesForStrand } from '@/data/curriculum';
+import { strandPathway } from '@/data/curriculum';
 import { GRADE_CONFIG, SUBJECTS } from './constants';
 import { MEETING_THRESHOLD, needs, strengths } from './baseline';
 import type { Baseline, BaselineProfile, IEP, IEPGoal } from './iep-types';
@@ -15,6 +15,9 @@ import type { Baseline, BaselineProfile, IEP, IEPGoal } from './iep-types';
 /** Goals beyond this stop being a plan and start being a wish list. */
 export const MAX_GOALS = 6;
 export const MODULES_PER_GOAL = 4;
+
+/** Years of earlier material a goal may reach back into to teach at level. */
+export const PATHWAY_BACK_GRADES = 2;
 
 /** Expected growth over one review cycle, by how far behind the pupil is. */
 const GROWTH_BY_BAND: Record<string, number> = {
@@ -54,7 +57,7 @@ function goalStatement(baseline: Baseline, target: number, grade: string, studen
   // Named, measurable and time-bound — the three things a goal is reviewed against.
   const who = studentName.trim().split(/\s+/)[0] || 'The pupil';
   return (
-    `Given ${gradeLabel(grade)} ${subjectName(baseline.subject).toLowerCase()} material in ` +
+    `Given ${gradeLabel(grade)} ${subjectName(baseline.subject)} material in ` +
     `${baseline.strand}, ${who} will improve from a baseline of ${baseline.percent}% ` +
     `to ${target}% or better on module checkpoints by the next review.`
   );
@@ -150,7 +153,12 @@ export function buildIEP(profile: BaselineProfile, options: PlanOptions = {}): I
 
   const goals: IEPGoal[] = [];
   for (const baseline of candidates) {
-    const available = modulesForStrand(profile.grade, baseline.subject, baseline.strand);
+    const available = strandPathway(
+      profile.grade,
+      baseline.subject,
+      baseline.strand,
+      PATHWAY_BACK_GRADES,
+    );
     if (available.length === 0) continue;
 
     const start = startIndexFor(baseline.percent, available.length);
@@ -202,6 +210,6 @@ export function buildIEP(profile: BaselineProfile, options: PlanOptions = {}): I
 /** Strands that need work but have no catalogue modules at this grade. */
 export function uncoveredStrands(profile: BaselineProfile): Baseline[] {
   return needs(profile).filter(
-    b => modulesForStrand(profile.grade, b.subject, b.strand).length === 0,
+    b => strandPathway(profile.grade, b.subject, b.strand, PATHWAY_BACK_GRADES).length === 0,
   );
 }

@@ -15,9 +15,9 @@ function record(over: Partial<AssessmentRecord> = {}): AssessmentRecord {
     id: over.id ?? `a_${Math.random()}`,
     studentRef: 'G6-001',
     studentName: 'Anaya Persaud',
-    grade: '6th',
+    grade: 'grade6',
     subject: 'math',
-    strand: 'Number & Operations',
+    strand: 'Number Concepts',
     assessment: 'Term 1 Diagnostic',
     date: '2026-01-14',
     score: 20,
@@ -51,8 +51,8 @@ describe('computeBaselines', () => {
   it('produces one baseline per subject and strand', () => {
     const baselines = computeBaselines([
       record({ strand: 'Geometry', percent: 80 }),
-      record({ strand: 'Number & Operations', percent: 40 }),
-      record({ subject: 'english', strand: 'Reading', percent: 60 }),
+      record({ strand: 'Number Concepts', percent: 40 }),
+      record({ subject: 'english', strand: 'Reading and Comprehension', percent: 60 }),
     ]);
     expect(baselines).toHaveLength(3);
   });
@@ -60,9 +60,9 @@ describe('computeBaselines', () => {
   it('sorts weakest first so the neediest strand leads', () => {
     const baselines = computeBaselines([
       record({ strand: 'Geometry', percent: 80 }),
-      record({ strand: 'Number & Operations', percent: 30 }),
+      record({ strand: 'Number Concepts', percent: 30 }),
     ]);
-    expect(baselines[0].strand).toBe('Number & Operations');
+    expect(baselines[0].strand).toBe('Number Concepts');
   });
 
   it('weights a recent result above an old one', () => {
@@ -96,35 +96,35 @@ describe('computeBaselines', () => {
 });
 
 describe('buildBaselineProfile', () => {
-  const identity = { studentId: 'stu_1', studentName: 'Anaya Persaud', grade: '6th' };
+  const identity = { studentId: 'stu_1', studentName: 'Anaya Persaud', grade: 'grade6' };
 
   it('lists only strands below expectation as priorities, weakest first', () => {
     const profile = buildBaselineProfile(
       [
         record({ strand: 'Geometry', percent: 82 }),
-        record({ strand: 'Number & Operations', percent: 28 }),
-        record({ subject: 'english', strand: 'Reading', percent: 55 }),
+        record({ strand: 'Number Concepts', percent: 28 }),
+        record({ subject: 'english', strand: 'Reading and Comprehension', percent: 55 }),
       ],
       identity,
     );
-    expect(profile.priorityStrands).toEqual(['math::Number & Operations', 'english::Reading']);
+    expect(profile.priorityStrands).toEqual(['math::Number Concepts', 'english::Reading and Comprehension']);
   });
 
   it('splits strengths from needs at the meeting threshold', () => {
     const profile = buildBaselineProfile(
-      [record({ strand: 'Geometry', percent: 70 }), record({ strand: 'Number & Operations', percent: 69 })],
+      [record({ strand: 'Geometry', percent: 70 }), record({ strand: 'Number Concepts', percent: 69 })],
       identity,
     );
     expect(strengths(profile).map(b => b.strand)).toEqual(['Geometry']);
-    expect(needs(profile).map(b => b.strand)).toEqual(['Number & Operations']);
+    expect(needs(profile).map(b => b.strand)).toEqual(['Number Concepts']);
   });
 
   it('weights the overall figure by how much evidence backs each strand', () => {
     const profile = buildBaselineProfile(
       [
-        record({ strand: 'Number & Operations', percent: 30 }),
-        record({ strand: 'Number & Operations', percent: 30, id: 'b' }),
-        record({ strand: 'Number & Operations', percent: 30, id: 'c' }),
+        record({ strand: 'Number Concepts', percent: 30 }),
+        record({ strand: 'Number Concepts', percent: 30, id: 'b' }),
+        record({ strand: 'Number Concepts', percent: 30, id: 'c' }),
         record({ strand: 'Geometry', percent: 90 }),
       ],
       identity,

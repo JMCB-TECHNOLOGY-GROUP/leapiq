@@ -3,7 +3,7 @@ import {
   LEITNER_INTERVALS,
   BLOOMS,
   SUBJECTS,
-  STATES,
+  EDUCATION_DISTRICTS,
   GRADE_OPTIONS,
   GRADE_CONFIG,
   STANDARDS_MAP,
@@ -49,33 +49,38 @@ describe('SUBJECTS', () => {
     }
   });
 
-  it('contains math, history, science, english', () => {
+  it('contains the four core subjects of Guyana’s national curriculum', () => {
     const ids = SUBJECTS.map(s => s.id);
     expect(ids).toContain('math');
-    expect(ids).toContain('history');
+    expect(ids).toContain('social');
     expect(ids).toContain('science');
     expect(ids).toContain('english');
   });
 });
 
-describe('STATES', () => {
-  it('has 51 entries (50 states + DC)', () => {
-    expect(STATES).toHaveLength(51);
+describe('EDUCATION_DISTRICTS', () => {
+  it('has the eleven districts: ten regions plus Georgetown', () => {
+    expect(EDUCATION_DISTRICTS).toHaveLength(11);
+    expect(EDUCATION_DISTRICTS[10].name).toBe('Georgetown');
   });
 
-  it('each state has code, name, and std', () => {
-    for (const state of STATES) {
-      expect(state.code).toBeTruthy();
-      expect(state.name).toBeTruthy();
-      expect(state.std).toBeTruthy();
-      expect(state.code.length).toBeLessThanOrEqual(2);
+  it('each district has a code, name and region', () => {
+    for (const district of EDUCATION_DISTRICTS) {
+      expect(district.code).toBeTruthy();
+      expect(district.name).toBeTruthy();
+      expect(district.region).toBeTruthy();
     }
+  });
+
+  it('flags the four hinterland regions', () => {
+    const hinterland = EDUCATION_DISTRICTS.filter(d => d.hinterland).map(d => d.code);
+    expect(hinterland).toEqual(['1', '7', '8', '9']);
   });
 });
 
 describe('GRADE_OPTIONS', () => {
-  it('has 15 options (prek through college)', () => {
-    expect(GRADE_OPTIONS).toHaveLength(15);
+  it('covers Nursery 1 through Form 5', () => {
+    expect(GRADE_OPTIONS).toHaveLength(13);
   });
 
   it('each option has value and label', () => {
@@ -85,9 +90,9 @@ describe('GRADE_OPTIONS', () => {
     }
   });
 
-  it('starts with prek and ends with college', () => {
-    expect(GRADE_OPTIONS[0].value).toBe('prek');
-    expect(GRADE_OPTIONS[GRADE_OPTIONS.length - 1].value).toBe('college');
+  it('starts at Nursery 1 and ends at Form 5', () => {
+    expect(GRADE_OPTIONS[0].value).toBe('nursery1');
+    expect(GRADE_OPTIONS[GRADE_OPTIONS.length - 1].value).toBe('form5');
   });
 });
 
@@ -107,19 +112,33 @@ describe('GRADE_CONFIG', () => {
     }
   });
 
-  it('prek only has math and english', () => {
-    expect(GRADE_CONFIG['prek'].subjects).toEqual(['math', 'english']);
+  it('nursery only has mathematics and english', () => {
+    expect(GRADE_CONFIG['nursery1'].subjects).toEqual(['math', 'english']);
   });
 
-  it('higher grades have all 4 subjects', () => {
-    expect(GRADE_CONFIG['5th'].subjects).toHaveLength(4);
-    expect(GRADE_CONFIG['college'].subjects).toHaveLength(4);
+  it('grade 3 upward has all four subjects', () => {
+    expect(GRADE_CONFIG['grade3'].subjects).toHaveLength(4);
+    expect(GRADE_CONFIG['form5'].subjects).toHaveLength(4);
+  });
+
+  it('names the national assessment for the years that sit one', () => {
+    expect(GRADE_CONFIG['grade6'].assessment).toContain('NGSA');
+    expect(GRADE_CONFIG['form5'].assessment).toContain('CSEC');
+    expect(GRADE_CONFIG['grade5'].assessment).toBeUndefined();
   });
 });
 
 describe('STANDARDS_MAP', () => {
   it('has entries for all 4 subjects', () => {
-    expect(Object.keys(STANDARDS_MAP)).toEqual(expect.arrayContaining(['math', 'science', 'history', 'english']));
+    expect(Object.keys(STANDARDS_MAP)).toEqual(expect.arrayContaining(['math', 'science', 'social', 'english']));
+  });
+
+  it('uses Guyana strand references, never US standard codes', () => {
+    for (const categories of Object.values(STANDARDS_MAP)) {
+      for (const standards of Object.values(categories)) {
+        for (const std of standards) expect(std.code).toMatch(/^GY-/);
+      }
+    }
   });
 
   it('each standard has code and description', () => {

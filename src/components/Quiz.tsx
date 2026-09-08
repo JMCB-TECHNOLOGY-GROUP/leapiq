@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/app-context';
-import { SUBJECTS, GRADE_CONFIG, STATES, STANDARDS_MAP } from '@/lib/constants';
+import { SUBJECTS, GRADE_CONFIG, CURRICULUM_AUTHORITY, STANDARDS_MAP } from '@/lib/constants';
 import { getAdaptiveQuestions } from '@/lib/adaptive-engine';
 import { updateSR } from '@/lib/storage';
 import type { Question } from '@/lib/types';
@@ -13,9 +13,9 @@ export default function Quiz({ subject, onDone, onBack }: {
   onBack: () => void;
 }) {
   const { user, recordSession } = useApp();
-  const grade = user?.grade || '5th';
-  const state = user?.state || 'DC';
-  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['5th'];
+  const grade = user?.grade || 'grade6';
+  const district = user?.district || '4';
+  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['grade6'];
   const subj = SUBJECTS.find(s => s.id === subject);
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -44,7 +44,7 @@ export default function Quiz({ subject, onDone, onBack }: {
         const res = await fetch('/api/generate-questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subject, grade, state, count: gc.qCount }),
+          body: JSON.stringify({ subject, grade, district, count: gc.qCount }),
         });
         const data = await res.json();
         if (data.questions && data.questions.length > 0) {
@@ -58,7 +58,7 @@ export default function Quiz({ subject, onDone, onBack }: {
       setLoading(false);
     }
     loadQuestions();
-  }, [subject, grade, state, gc.qCount, user?.id]);
+  }, [subject, grade, district, gc.qCount, user?.id]);
 
   if (loading) {
     return (
@@ -68,7 +68,7 @@ export default function Quiz({ subject, onDone, onBack }: {
           <div className="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin" />
         </div>
         <p className="text-gray-500 font-semibold text-sm">Preparing {subj?.name} questions...</p>
-        <p className="text-gray-400 text-xs mt-1">Aligned to {STATES.find(s => s.code === state)?.std || 'state'} standards</p>
+        <p className="text-gray-400 text-xs mt-1">Aligned to the {CURRICULUM_AUTHORITY}</p>
       </div>
     );
   }

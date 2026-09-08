@@ -48,7 +48,7 @@ export default function DocUpload({ onBack }: { onBack: () => void }) {
           content: doc.content,
           type: doc.type,
           name: user?.name || 'Student',
-          grade: user?.grade || '5th',
+          grade: user?.grade || 'grade6',
         }),
       });
       const data = await res.json();

@@ -1,20 +1,26 @@
 import type { BloomLevel } from '@/lib/constants';
 import type { CurriculumModule } from '@/lib/iep-types';
+import { GRADE_ORDER, gradeById } from './guyana';
+
+export { GRADE_ORDER };
 
 /**
- * Pre-populated class materials.
+ * Pre-populated class materials for Guyana's national curriculum.
  *
- * Every grade from Pre-K to College ships with a catalogue of modules, so a plan
- * can be built the moment assessment data lands — nobody has to author content
- * first. A seed lists the grades it serves; a module is the seed instantiated for
- * one grade, which is what gets assigned to a pupil.
+ * Every year of schooling — Nursery 1 through Form 5 — ships with a module
+ * catalogue, so a plan can assign work the moment assessment data lands and
+ * nobody has to author content first.
  *
- * Strand names match the question categories in `STANDARDS_MAP` wherever the two
- * overlap, so quiz results roll straight into the matching plan goal.
+ * Strand names follow the Guyana National Curriculum guides published by NCERD
+ * and match the question categories in `STANDARDS_MAP`, so quiz results roll
+ * straight into the matching plan goal. Modules build toward the national
+ * assessments: the Grade Two and Grade Four assessments, the NGSA at Grade 6,
+ * the Grade Nine assessment at Form 3, and CSEC at Form 5.
  */
 interface ModuleSeed {
   subject: string;
   strand: string;
+  /** Grade ids this module is taught in. */
   grades: string[];
   title: string;
   objective: string;
@@ -24,134 +30,196 @@ interface ModuleSeed {
   standards?: string[];
 }
 
-/** Grade keys in teaching order. Drives cross-grade prerequisite chaining. */
-export const GRADE_ORDER = [
-  'prek', 'k', '1st', '2nd', '3rd', '4th', '5th', '6th',
-  '7th', '8th', '9th', '10th', '11th', '12th', 'college',
-];
-
 const SEEDS: ModuleSeed[] = [
-  // ── Math · Number & Operations ──
-  { subject: 'math', strand: 'Number & Operations', grades: ['prek'], title: 'Counting to 10', objective: 'Count a group of up to ten objects and say how many there are.', bloom: 'remember', difficulty: 1 },
-  { subject: 'math', strand: 'Number & Operations', grades: ['prek', 'k'], title: 'Number Names and Order', objective: 'Name written numerals 0-10 and put them in order.', bloom: 'remember', difficulty: 1 },
-  { subject: 'math', strand: 'Number & Operations', grades: ['k'], title: 'Counting to 100 by Ones and Tens', objective: 'Count forward to 100 by ones and by tens from any starting number.', bloom: 'remember', difficulty: 2, standards: ['K.CC.A.1'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['k', '1st'], title: 'Adding and Subtracting Within 10', objective: 'Solve addition and subtraction problems within 10 using objects or drawings.', bloom: 'apply', difficulty: 2, standards: ['K.OA.A.2'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['1st'], title: 'Place Value to 100', objective: 'Understand that the two digits of a two-digit number represent tens and ones.', bloom: 'understand', difficulty: 2, standards: ['1.NBT.B.2'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['1st', '2nd'], title: 'Addition and Subtraction Within 20', objective: 'Add and subtract within 20 fluently, using make-a-ten and doubles strategies.', bloom: 'apply', difficulty: 3, standards: ['2.OA.B.2'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['2nd'], title: 'Place Value to 1,000', objective: 'Read, write and compare three-digit numbers using hundreds, tens and ones.', bloom: 'understand', difficulty: 3, standards: ['2.NBT.A.1'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['3rd'], title: 'Multiplication and Division Within 100', objective: 'Multiply and divide within 100 using the relationship between the two operations.', bloom: 'apply', difficulty: 3, standards: ['3.OA.C.7'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['3rd', '4th'], title: 'Fractions on a Number Line', objective: 'Represent a fraction on a number line and explain what the numerator and denominator mean.', bloom: 'understand', difficulty: 3, standards: ['3.NF.A.2'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['4th'], title: 'Equivalent Fractions', objective: 'Recognise and generate equivalent fractions and explain why they are equal.', bloom: 'understand', difficulty: 3, standards: ['4.NF.A.1'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['4th', '5th'], title: 'Multi-Digit Multiplication', objective: 'Multiply a multi-digit number by a two-digit number using place-value strategies.', bloom: 'apply', difficulty: 4, standards: ['4.NBT.B.5'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['5th'], title: 'Adding and Subtracting Unlike Fractions', objective: 'Add and subtract fractions with unlike denominators by finding a common denominator.', bloom: 'apply', difficulty: 4, standards: ['5.NF.A.1'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['5th', '6th'], title: 'Decimals to Hundredths', objective: 'Add, subtract, multiply and divide decimals to hundredths.', bloom: 'apply', difficulty: 4, standards: ['5.NBT.B.7'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['5th', '6th'], title: 'Dividing by Unit Fractions', objective: 'Divide a whole number by a unit fraction and a unit fraction by a whole number.', bloom: 'analyze', difficulty: 5, standards: ['5.NF.B.7'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['6th', '7th'], title: 'Ratios and Unit Rates', objective: 'Use ratio reasoning and unit rates to solve real-world problems.', bloom: 'apply', difficulty: 4, standards: ['6.RP.A.3'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['7th'], title: 'Operations With Integers', objective: 'Add, subtract, multiply and divide positive and negative rational numbers.', bloom: 'apply', difficulty: 4, standards: ['7.NS.A.2'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['7th', '8th'], title: 'Percent Increase and Decrease', objective: 'Solve multi-step percent problems including markup, discount and interest.', bloom: 'analyze', difficulty: 5, standards: ['7.RP.A.3'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['8th'], title: 'Exponents and Scientific Notation', objective: 'Apply the properties of integer exponents and work in scientific notation.', bloom: 'apply', difficulty: 4, standards: ['8.EE.A.1'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['9th', '10th'], title: 'Rational and Irrational Numbers', objective: 'Classify real numbers and reason about sums and products of rational and irrational numbers.', bloom: 'analyze', difficulty: 4, standards: ['HSN.RN.B.3'] },
-  { subject: 'math', strand: 'Number & Operations', grades: ['11th', '12th', 'college'], title: 'Complex Numbers', objective: 'Perform arithmetic with complex numbers and interpret them geometrically.', bloom: 'analyze', difficulty: 5, standards: ['HSN.CN.A.2'] },
+  // ── Mathematics · Sets ──
+  { subject: 'math', strand: 'Sets', grades: ['nursery1', 'nursery2'], title: 'Sorting and Matching', objective: 'Sort objects into groups by colour, shape or size and say why they belong together.', bloom: 'understand', difficulty: 1, standards: ['GY-MATH-ST1'] },
+  { subject: 'math', strand: 'Sets', grades: ['grade1', 'grade2'], title: 'Grouping by Attribute', objective: 'Group objects by one attribute and count how many are in each group.', bloom: 'understand', difficulty: 1, standards: ['GY-MATH-ST1'] },
+  { subject: 'math', strand: 'Sets', grades: ['grade3', 'grade4'], title: 'Sets and Their Members', objective: 'Describe a set, list its members, and identify empty and equal sets.', bloom: 'understand', difficulty: 2, standards: ['GY-MATH-ST2'] },
+  { subject: 'math', strand: 'Sets', grades: ['grade5', 'grade6'], title: 'Union, Intersection and Venn Diagrams', objective: 'Use Venn diagrams to show union and intersection and solve simple set problems.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-ST2'] },
+  { subject: 'math', strand: 'Sets', grades: ['form1', 'form2'], title: 'Set Notation and Problem Solving', objective: 'Use set notation and Venn diagrams to solve two-set and three-set problems.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-ST2'] },
 
-  // ── Math · Operations & Algebraic Thinking ──
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['1st', '2nd'], title: 'Patterns and Number Sentences', objective: 'Extend a repeating pattern and complete a missing-number sentence.', bloom: 'understand', difficulty: 2 },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['3rd', '4th'], title: 'Two-Step Word Problems', objective: 'Solve two-step word problems and judge whether an answer is reasonable.', bloom: 'apply', difficulty: 3, standards: ['3.OA.D.8'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['5th'], title: 'Order of Operations', objective: 'Evaluate expressions containing parentheses, brackets and braces.', bloom: 'apply', difficulty: 3, standards: ['5.OA.A.1'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['5th', '6th'], title: 'Writing Expressions', objective: 'Write and read expressions that record calculations with numbers and letters.', bloom: 'understand', difficulty: 3, standards: ['5.OA.A.2'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['6th', '7th'], title: 'Solving One-Step Equations', objective: 'Solve one-step equations and inequalities and graph the solution set.', bloom: 'apply', difficulty: 4, standards: ['6.EE.B.7'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['8th', '9th'], title: 'Linear Functions', objective: 'Interpret slope and intercept, and construct a linear function from a table or graph.', bloom: 'analyze', difficulty: 4, standards: ['8.F.B.4'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['9th', '10th'], title: 'Systems of Equations', objective: 'Solve systems of linear equations algebraically and graphically.', bloom: 'analyze', difficulty: 5, standards: ['HSA.REI.C.6'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['10th', '11th'], title: 'Quadratic Functions', objective: 'Solve quadratic equations and interpret the graph of a quadratic function.', bloom: 'analyze', difficulty: 5, standards: ['HSA.REI.B.4'] },
-  { subject: 'math', strand: 'Operations & Algebraic Thinking', grades: ['12th', 'college'], title: 'Limits and Rates of Change', objective: 'Estimate a limit numerically and connect it to an average rate of change.', bloom: 'analyze', difficulty: 5 },
+  // ── Mathematics · Number Concepts ──
+  { subject: 'math', strand: 'Number Concepts', grades: ['nursery1'], title: 'Counting to 10', objective: 'Count a group of up to ten objects and say how many there are.', bloom: 'remember', difficulty: 1, standards: ['GY-MATH-NC1'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['nursery2'], title: 'Number Names and Order to 20', objective: 'Name and order the numerals 0 to 20 and match each to a quantity.', bloom: 'remember', difficulty: 1, standards: ['GY-MATH-NC1'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['grade1'], title: 'Counting and Number Names to 100', objective: 'Count, read and write numbers to 100 and count on and back from any number.', bloom: 'remember', difficulty: 2, standards: ['GY-MATH-NC1'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['grade2'], title: 'Place Value to 1 000', objective: 'Read, write and compare three-digit numbers using hundreds, tens and ones.', bloom: 'understand', difficulty: 2, standards: ['GY-MATH-NC1'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['grade3', 'grade4'], title: 'Place Value to 100 000', objective: 'Read, write, order and round large whole numbers using place value.', bloom: 'understand', difficulty: 3, standards: ['GY-MATH-NC1'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['grade4', 'grade5'], title: 'Factors, Multiples and Number Patterns', objective: 'Find factors and multiples, recognise squares, and continue number patterns.', bloom: 'apply', difficulty: 3, standards: ['GY-MATH-NC2'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['grade6'], title: 'Rounding, Estimation and Large Numbers', objective: 'Round and estimate to check whether an answer to a large calculation is reasonable.', bloom: 'analyze', difficulty: 4, standards: ['GY-MATH-NC2'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['form1', 'form2'], title: 'Directed Numbers and the Number Line', objective: 'Order and compare positive and negative numbers and place them on a number line.', bloom: 'understand', difficulty: 3, standards: ['GY-MATH-NC1'] },
+  { subject: 'math', strand: 'Number Concepts', grades: ['form3', 'form4'], title: 'Indices and Standard Form', objective: 'Apply the laws of indices and write large and small numbers in standard form.', bloom: 'apply', difficulty: 5, standards: ['GY-MATH-NC2'] },
 
-  // ── Math · Measurement & Data ──
-  { subject: 'math', strand: 'Measurement & Data', grades: ['prek', 'k'], title: 'Sorting and Comparing', objective: 'Sort objects by one attribute and compare which group has more.', bloom: 'understand', difficulty: 1 },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['1st', '2nd'], title: 'Measuring Length', objective: 'Measure the length of an object using standard units and a ruler.', bloom: 'apply', difficulty: 2, standards: ['2.MD.A.1'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['2nd', '3rd'], title: 'Telling Time and Money', objective: 'Tell time to the nearest five minutes and solve word problems involving money.', bloom: 'apply', difficulty: 2, standards: ['2.MD.C.7'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['3rd', '4th'], title: 'Reading Bar and Picture Graphs', objective: 'Draw a scaled bar graph and answer comparison questions from it.', bloom: 'analyze', difficulty: 3, standards: ['3.MD.B.3'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['4th', '5th'], title: 'Converting Measurement Units', objective: 'Convert among different-sized standard measurement units within one system.', bloom: 'apply', difficulty: 3, standards: ['5.MD.A.1'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['5th', '6th'], title: 'Volume of Solid Figures', objective: 'Relate volume to multiplication and find the volume of a rectangular prism.', bloom: 'apply', difficulty: 4, standards: ['5.MD.C.5'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['6th', '7th'], title: 'Mean, Median and Spread', objective: 'Summarise a data set with measures of centre and describe its variability.', bloom: 'analyze', difficulty: 4, standards: ['6.SP.B.5'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['8th', '9th'], title: 'Scatter Plots and Association', objective: 'Construct a scatter plot and describe the association between two variables.', bloom: 'analyze', difficulty: 4, standards: ['8.SP.A.1'] },
-  { subject: 'math', strand: 'Measurement & Data', grades: ['10th', '11th', '12th', 'college'], title: 'Probability and Inference', objective: 'Compute conditional probability and evaluate a claim from sample data.', bloom: 'analyze', difficulty: 5, standards: ['HSS.CP.A.3'] },
+  // ── Mathematics · Operations, Relations and Properties ──
+  { subject: 'math', strand: 'Operations, Relations and Properties', grades: ['grade1', 'grade2'], title: 'Addition and Subtraction to 20', objective: 'Add and subtract within 20 using make-a-ten, doubles and number bonds.', bloom: 'apply', difficulty: 2, standards: ['GY-MATH-OP1'] },
+  { subject: 'math', strand: 'Operations, Relations and Properties', grades: ['grade2', 'grade3'], title: 'Addition and Subtraction to 1 000', objective: 'Add and subtract three-digit numbers with regrouping.', bloom: 'apply', difficulty: 3, standards: ['GY-MATH-OP1'] },
+  { subject: 'math', strand: 'Operations, Relations and Properties', grades: ['grade3', 'grade4'], title: 'Multiplication and Division Facts', objective: 'Recall multiplication and division facts to 12 and use the link between them.', bloom: 'remember', difficulty: 3, standards: ['GY-MATH-OP1'] },
+  { subject: 'math', strand: 'Operations, Relations and Properties', grades: ['grade4', 'grade5'], title: 'Long Multiplication and Division', objective: 'Multiply and divide multi-digit numbers using written methods.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-OP1'] },
+  { subject: 'math', strand: 'Operations, Relations and Properties', grades: ['grade5', 'grade6'], title: 'Order of Operations and Multi-Step Problems', objective: 'Apply the order of operations and solve multi-step word problems.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-OP2', 'GY-MATH-OP3'] },
+  { subject: 'math', strand: 'Operations, Relations and Properties', grades: ['form1', 'form2'], title: 'Operations with Directed Numbers', objective: 'Add, subtract, multiply and divide positive and negative numbers.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-OP1'] },
 
-  // ── Math · Geometry ──
-  { subject: 'math', strand: 'Geometry', grades: ['prek', 'k'], title: 'Naming 2D Shapes', objective: 'Name circles, squares, triangles and rectangles in any orientation.', bloom: 'remember', difficulty: 1 },
-  { subject: 'math', strand: 'Geometry', grades: ['1st', '2nd'], title: 'Composing Shapes', objective: 'Build larger shapes from smaller ones and partition shapes into equal parts.', bloom: 'apply', difficulty: 2, standards: ['1.G.A.2'] },
-  { subject: 'math', strand: 'Geometry', grades: ['3rd', '4th'], title: 'Perimeter and Area', objective: 'Find the perimeter and area of rectangles and solve problems involving both.', bloom: 'apply', difficulty: 3, standards: ['3.MD.D.8'] },
-  { subject: 'math', strand: 'Geometry', grades: ['4th', '5th'], title: 'Angles and Lines', objective: 'Classify angles and identify parallel and perpendicular lines in figures.', bloom: 'understand', difficulty: 3, standards: ['4.G.A.1'] },
-  { subject: 'math', strand: 'Geometry', grades: ['5th', '6th'], title: 'The Coordinate Plane', objective: 'Plot points in all four quadrants and interpret coordinate values in context.', bloom: 'apply', difficulty: 3, standards: ['5.G.A.1'] },
-  { subject: 'math', strand: 'Geometry', grades: ['6th', '7th'], title: 'Area of Triangles and Polygons', objective: 'Find the area of triangles, special quadrilaterals and composite polygons.', bloom: 'apply', difficulty: 4, standards: ['6.G.A.1'] },
-  { subject: 'math', strand: 'Geometry', grades: ['8th', '9th'], title: 'Pythagorean Theorem', objective: 'Apply the Pythagorean theorem to find unknown side lengths in right triangles.', bloom: 'apply', difficulty: 4, standards: ['8.G.B.7'] },
-  { subject: 'math', strand: 'Geometry', grades: ['10th', '11th'], title: 'Similarity and Trigonometric Ratios', objective: 'Use similarity to define sine, cosine and tangent and solve right triangles.', bloom: 'analyze', difficulty: 5, standards: ['HSG.SRT.C.8'] },
+  // ── Mathematics · Fractions, Decimals and Percentages ──
+  { subject: 'math', strand: 'Fractions, Decimals and Percentages', grades: ['grade3', 'grade4'], title: 'Introducing Fractions', objective: 'Name, write and compare simple fractions of a shape and of a set.', bloom: 'understand', difficulty: 2, standards: ['GY-MATH-FD1'] },
+  { subject: 'math', strand: 'Fractions, Decimals and Percentages', grades: ['grade4', 'grade5'], title: 'Equivalent Fractions', objective: 'Generate equivalent fractions, simplify, and compare fractions with unlike denominators.', bloom: 'understand', difficulty: 3, standards: ['GY-MATH-FD1'] },
+  { subject: 'math', strand: 'Fractions, Decimals and Percentages', grades: ['grade5', 'grade6'], title: 'Adding and Subtracting Fractions', objective: 'Add and subtract fractions with unlike denominators by finding a common denominator.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-FD1'] },
+  { subject: 'math', strand: 'Fractions, Decimals and Percentages', grades: ['grade5', 'grade6'], title: 'Decimals to Hundredths', objective: 'Read, order and calculate with decimals to two places.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-FD2'] },
+  { subject: 'math', strand: 'Fractions, Decimals and Percentages', grades: ['grade6', 'form1'], title: 'Percentages, Ratio and Proportion', objective: 'Convert between fractions, decimals and percentages and solve ratio problems.', bloom: 'apply', difficulty: 5, standards: ['GY-MATH-FD2', 'GY-MATH-FD3'] },
+  { subject: 'math', strand: 'Fractions, Decimals and Percentages', grades: ['form2', 'form3'], title: 'Percentage Change in Context', objective: 'Solve multi-step problems involving percentage increase, decrease and proportion.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-FD3'] },
 
-  // ── English · Reading ──
-  { subject: 'english', strand: 'Reading', grades: ['prek', 'k'], title: 'Letter Sounds', objective: 'Match each consonant and short vowel to its most common sound.', bloom: 'remember', difficulty: 1, standards: ['RF.K.3'] },
-  { subject: 'english', strand: 'Reading', grades: ['k', '1st'], title: 'Blending and Decoding CVC Words', objective: 'Blend sounds to read simple consonant-vowel-consonant words.', bloom: 'apply', difficulty: 2, standards: ['RF.1.2'] },
-  { subject: 'english', strand: 'Reading', grades: ['1st', '2nd'], title: 'Retelling a Story', objective: 'Retell a story in order and identify its central message.', bloom: 'understand', difficulty: 2, standards: ['RL.1.2'] },
-  { subject: 'english', strand: 'Reading', grades: ['2nd', '3rd'], title: 'Reading Fluency', objective: 'Read grade-level text accurately and with expression at an appropriate rate.', bloom: 'apply', difficulty: 3, standards: ['RF.3.4'] },
-  { subject: 'english', strand: 'Reading', grades: ['3rd', '4th'], title: 'Main Idea and Supporting Detail', objective: 'Determine the main idea of a passage and the details that support it.', bloom: 'analyze', difficulty: 3, standards: ['RI.4.2'] },
-  { subject: 'english', strand: 'Reading', grades: ['4th', '5th'], title: 'Theme in Literature', objective: 'Determine a theme of a story, drama or poem from details in the text.', bloom: 'analyze', difficulty: 4, standards: ['RL.5.2'] },
-  { subject: 'english', strand: 'Reading', grades: ['5th', '6th'], title: 'Figurative Language', objective: 'Interpret figurative language, including similes, metaphors and idioms.', bloom: 'analyze', difficulty: 4, standards: ['RL.5.4'] },
-  { subject: 'english', strand: 'Reading', grades: ['6th', '7th'], title: 'Inference and Evidence', objective: 'Draw an inference from a text and cite the evidence that supports it.', bloom: 'analyze', difficulty: 4, standards: ['RL.7.1'] },
-  { subject: 'english', strand: 'Reading', grades: ['8th', '9th'], title: 'Author’s Purpose and Point of View', objective: 'Analyse how an author develops point of view and responds to conflicting evidence.', bloom: 'analyze', difficulty: 5, standards: ['RI.8.6'] },
-  { subject: 'english', strand: 'Reading', grades: ['10th', '11th', '12th', 'college'], title: 'Analysing Complex Texts', objective: 'Analyse the structure and rhetoric of complex informational and literary texts.', bloom: 'analyze', difficulty: 5, standards: ['RI.11-12.6'] },
+  // ── Mathematics · Measurement ──
+  { subject: 'math', strand: 'Measurement', grades: ['nursery1', 'nursery2'], title: 'Comparing Size and Length', objective: 'Compare objects as longer, shorter, heavier or lighter and order them.', bloom: 'understand', difficulty: 1, standards: ['GY-MATH-ME1'] },
+  { subject: 'math', strand: 'Measurement', grades: ['grade1', 'grade2'], title: 'Measuring Length and Mass', objective: 'Measure length in centimetres and metres and mass in grams and kilograms.', bloom: 'apply', difficulty: 2, standards: ['GY-MATH-ME1'] },
+  { subject: 'math', strand: 'Measurement', grades: ['grade2', 'grade3'], title: 'Telling Time', objective: 'Tell and write time to five minutes and solve simple problems about duration.', bloom: 'apply', difficulty: 2, standards: ['GY-MATH-ME1'] },
+  { subject: 'math', strand: 'Measurement', grades: ['grade3', 'grade4'], title: 'Money and Shopping', objective: 'Add and subtract amounts in Guyana dollars and work out change.', bloom: 'apply', difficulty: 3, standards: ['GY-MATH-ME1'] },
+  { subject: 'math', strand: 'Measurement', grades: ['grade4', 'grade5'], title: 'Perimeter and Area', objective: 'Find the perimeter and area of rectangles and of shapes made from rectangles.', bloom: 'apply', difficulty: 3, standards: ['GY-MATH-ME2'] },
+  { subject: 'math', strand: 'Measurement', grades: ['grade5', 'grade6'], title: 'Volume and Capacity', objective: 'Find the volume of a cuboid and convert between millilitres and litres.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-ME2'] },
+  { subject: 'math', strand: 'Measurement', grades: ['form1', 'form2'], title: 'Metric Conversions and Compound Measures', objective: 'Convert between metric units and work with rates such as speed and density.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-ME1'] },
+  { subject: 'math', strand: 'Measurement', grades: ['form3', 'form4'], title: 'Area and Volume of Composite Figures', objective: 'Find the area and volume of composite shapes, circles, prisms and cylinders.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-ME2'] },
 
-  // ── English · Writing ──
-  { subject: 'english', strand: 'Writing', grades: ['prek', 'k', '1st'], title: 'Writing Sentences', objective: 'Write a complete sentence with a capital letter and an end mark.', bloom: 'apply', difficulty: 1, standards: ['L.1.2'] },
-  { subject: 'english', strand: 'Writing', grades: ['2nd', '3rd'], title: 'Paragraph Structure', objective: 'Write a paragraph with a topic sentence, supporting detail and a closing.', bloom: 'apply', difficulty: 2, standards: ['W.3.2'] },
-  { subject: 'english', strand: 'Writing', grades: ['3rd', '4th'], title: 'Narrative Writing', objective: 'Write a narrative with a clear sequence of events and descriptive detail.', bloom: 'apply', difficulty: 3, standards: ['W.4.3'] },
-  { subject: 'english', strand: 'Writing', grades: ['4th', '5th'], title: 'Opinion Writing', objective: 'Write an opinion piece supporting a point of view with reasons and information.', bloom: 'apply', difficulty: 3, standards: ['W.5.1'] },
-  { subject: 'english', strand: 'Writing', grades: ['5th', '6th'], title: 'Informative Writing', objective: 'Write an informative text that examines a topic and conveys ideas clearly.', bloom: 'apply', difficulty: 4, standards: ['W.5.2'] },
-  { subject: 'english', strand: 'Writing', grades: ['7th', '8th'], title: 'Argument and Counterclaim', objective: 'Write an argument that acknowledges and answers an opposing claim.', bloom: 'analyze', difficulty: 4, standards: ['W.8.1'] },
-  { subject: 'english', strand: 'Writing', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Research and Citation', objective: 'Write a research piece that integrates and cites sources without plagiarism.', bloom: 'analyze', difficulty: 5, standards: ['W.9-10.8'] },
+  // ── Mathematics · Geometry ──
+  { subject: 'math', strand: 'Geometry', grades: ['nursery1', 'nursery2'], title: 'Naming Shapes', objective: 'Name circles, squares, triangles and rectangles in any position.', bloom: 'remember', difficulty: 1, standards: ['GY-MATH-GE1'] },
+  { subject: 'math', strand: 'Geometry', grades: ['grade1', 'grade2'], title: 'Plane Shapes and Solids', objective: 'Describe plane shapes and solids by their sides, corners and faces.', bloom: 'understand', difficulty: 2, standards: ['GY-MATH-GE1'] },
+  { subject: 'math', strand: 'Geometry', grades: ['grade3', 'grade4'], title: 'Lines, Angles and Symmetry', objective: 'Identify lines, right angles and lines of symmetry in shapes around them.', bloom: 'understand', difficulty: 3, standards: ['GY-MATH-GE2'] },
+  { subject: 'math', strand: 'Geometry', grades: ['grade5', 'grade6'], title: 'Properties of Polygons', objective: 'Classify triangles and quadrilaterals and use angle facts to find missing angles.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-GE1'] },
+  { subject: 'math', strand: 'Geometry', grades: ['form1', 'form2'], title: 'Angles, Parallel Lines and Constructions', objective: 'Use angle relationships in parallel lines and construct shapes with ruler and compasses.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-GE2'] },
+  { subject: 'math', strand: 'Geometry', grades: ['form3', 'form4'], title: 'Pythagoras and Trigonometric Ratios', objective: 'Apply Pythagoras’ theorem and the sine, cosine and tangent ratios to right triangles.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-GE2'] },
 
-  // ── English · Grammar ──
-  { subject: 'english', strand: 'Grammar', grades: ['1st', '2nd'], title: 'Nouns and Verbs', objective: 'Identify nouns and verbs and use them correctly in a sentence.', bloom: 'remember', difficulty: 1, standards: ['L.1.1'] },
-  { subject: 'english', strand: 'Grammar', grades: ['3rd', '4th'], title: 'Subject-Verb Agreement', objective: 'Make subjects and verbs agree in simple and compound sentences.', bloom: 'apply', difficulty: 3, standards: ['L.3.1'] },
-  { subject: 'english', strand: 'Grammar', grades: ['5th', '6th'], title: 'Punctuation and Clauses', objective: 'Punctuate compound and complex sentences using commas and conjunctions.', bloom: 'apply', difficulty: 3, standards: ['L.5.1'] },
-  { subject: 'english', strand: 'Grammar', grades: ['7th', '8th', '9th'], title: 'Sentence Variety and Voice', objective: 'Vary sentence structure and choose active or passive voice for effect.', bloom: 'analyze', difficulty: 4, standards: ['L.9-10.3'] },
+  // ── Mathematics · Statistics and Graphs ──
+  { subject: 'math', strand: 'Statistics and Graphs', grades: ['grade2', 'grade3'], title: 'Pictographs and Bar Graphs', objective: 'Read a pictograph and a bar graph and answer questions about the data.', bloom: 'understand', difficulty: 2, standards: ['GY-MATH-SG1'] },
+  { subject: 'math', strand: 'Statistics and Graphs', grades: ['grade4', 'grade5'], title: 'Tallies, Tables and Graphs', objective: 'Collect data with a tally, organise it in a table and draw a bar graph.', bloom: 'apply', difficulty: 3, standards: ['GY-MATH-SG1'] },
+  { subject: 'math', strand: 'Statistics and Graphs', grades: ['grade5', 'grade6'], title: 'Mean, Median and Mode', objective: 'Calculate the mean, median and mode of a small data set and say what each shows.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-SG2'] },
+  { subject: 'math', strand: 'Statistics and Graphs', grades: ['form1', 'form2'], title: 'Collecting and Displaying Data', objective: 'Design a data collection sheet and present results in an appropriate chart.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-SG1'] },
+  { subject: 'math', strand: 'Statistics and Graphs', grades: ['form3', 'form4'], title: 'Spread and Probability', objective: 'Describe the spread of a data set and calculate simple and combined probabilities.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-SG2'] },
 
-  // ── English · Vocabulary ──
-  { subject: 'english', strand: 'Vocabulary', grades: ['k', '1st', '2nd'], title: 'High-Frequency Words', objective: 'Read and spell the most common sight words on sight.', bloom: 'remember', difficulty: 1, standards: ['RF.2.3'] },
-  { subject: 'english', strand: 'Vocabulary', grades: ['3rd', '4th', '5th'], title: 'Context Clues', objective: 'Work out the meaning of an unknown word from the surrounding text.', bloom: 'apply', difficulty: 3, standards: ['L.5.4'] },
-  { subject: 'english', strand: 'Vocabulary', grades: ['6th', '7th', '8th'], title: 'Roots, Prefixes and Suffixes', objective: 'Use Greek and Latin word parts to work out the meaning of unfamiliar words.', bloom: 'apply', difficulty: 4, standards: ['L.7.4'] },
-  { subject: 'english', strand: 'Vocabulary', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Academic and Domain Vocabulary', objective: 'Acquire and use academic vocabulary precisely across subject areas.', bloom: 'analyze', difficulty: 4, standards: ['L.9-10.6'] },
+  // ── Mathematics · Algebra ──
+  { subject: 'math', strand: 'Algebra', grades: ['form1', 'form2'], title: 'Algebraic Expressions', objective: 'Write, simplify and substitute into algebraic expressions.', bloom: 'understand', difficulty: 3, standards: ['GY-MATH-AL1'] },
+  { subject: 'math', strand: 'Algebra', grades: ['form2', 'form3'], title: 'Solving Linear Equations', objective: 'Solve linear equations and inequalities in one unknown and check the solution.', bloom: 'apply', difficulty: 4, standards: ['GY-MATH-AL2'] },
+  { subject: 'math', strand: 'Algebra', grades: ['form3', 'form4'], title: 'Linear Graphs and Relations', objective: 'Draw and interpret linear graphs and find gradient and intercept.', bloom: 'analyze', difficulty: 4, standards: ['GY-MATH-AL2'] },
+  { subject: 'math', strand: 'Algebra', grades: ['form4', 'form5'], title: 'Simultaneous and Quadratic Equations', objective: 'Solve simultaneous linear equations and factorise and solve quadratics.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-AL2'] },
 
-  // ── Science · Physical Science ──
-  { subject: 'science', strand: 'Physical Science', grades: ['k', '1st', '2nd'], title: 'Properties of Materials', objective: 'Describe and sort materials by observable properties such as texture and hardness.', bloom: 'understand', difficulty: 1, standards: ['2-PS1-1'] },
-  { subject: 'science', strand: 'Physical Science', grades: ['3rd', '4th', '5th'], title: 'Identifying Materials by Property', objective: 'Make measurements to identify materials based on their properties.', bloom: 'apply', difficulty: 3, standards: ['5-PS1-3'] },
-  { subject: 'science', strand: 'Physical Science', grades: ['6th', '7th', '8th'], title: 'Forces and Motion', objective: 'Plan an investigation showing that a change in motion depends on the net force.', bloom: 'analyze', difficulty: 4, standards: ['MS-PS2-2'] },
-  { subject: 'science', strand: 'Physical Science', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Energy Transfer and Conservation', objective: 'Model energy transfer in a system and account for it quantitatively.', bloom: 'analyze', difficulty: 5, standards: ['HS-PS3-1'] },
+  // ── Mathematics · Consumer Arithmetic ──
+  { subject: 'math', strand: 'Consumer Arithmetic', grades: ['form2', 'form3'], title: 'Money, Wages and Bills', objective: 'Calculate wages, salaries and utility bills and check a bill for errors.', bloom: 'apply', difficulty: 3, standards: ['GY-MATH-CA1'] },
+  { subject: 'math', strand: 'Consumer Arithmetic', grades: ['form4', 'form5'], title: 'Discount, Interest and Hire Purchase', objective: 'Solve problems involving discount, simple and compound interest and hire purchase.', bloom: 'analyze', difficulty: 5, standards: ['GY-MATH-CA1'] },
 
-  // ── Science · Earth Science ──
-  { subject: 'science', strand: 'Earth Science', grades: ['k', '1st', '2nd'], title: 'Weather and Seasons', objective: 'Record daily weather and describe how it changes across the seasons.', bloom: 'understand', difficulty: 1, standards: ['K-ESS2-1'] },
-  { subject: 'science', strand: 'Earth Science', grades: ['3rd', '4th', '5th'], title: 'Earth Systems Interact', objective: 'Model how the geosphere, biosphere, hydrosphere and atmosphere interact.', bloom: 'analyze', difficulty: 3, standards: ['5-ESS2-1'] },
-  { subject: 'science', strand: 'Earth Science', grades: ['6th', '7th', '8th'], title: 'The Water Cycle and Climate', objective: 'Explain how water cycling and atmospheric circulation determine regional climate.', bloom: 'analyze', difficulty: 4, standards: ['MS-ESS2-6'] },
-  { subject: 'science', strand: 'Earth Science', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Human Impact on Earth Systems', objective: 'Evaluate a solution for reducing human impact on natural systems.', bloom: 'analyze', difficulty: 5, standards: ['HS-ESS3-4'] },
+  // ── English Language · Listening and Speaking ──
+  { subject: 'english', strand: 'Listening and Speaking', grades: ['nursery1', 'nursery2'], title: 'Listening and Responding', objective: 'Listen to a short story or instruction and respond appropriately.', bloom: 'understand', difficulty: 1, standards: ['GY-ENG-LS1'] },
+  { subject: 'english', strand: 'Listening and Speaking', grades: ['grade1', 'grade2'], title: 'Speaking in Full Sentences', objective: 'Answer a question in a complete, clearly spoken sentence.', bloom: 'apply', difficulty: 2, standards: ['GY-ENG-LS2'] },
+  { subject: 'english', strand: 'Listening and Speaking', grades: ['grade3', 'grade4'], title: 'Retelling and Reporting', objective: 'Retell an event in order and report information clearly to the class.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-LS2'] },
+  { subject: 'english', strand: 'Listening and Speaking', grades: ['grade5', 'grade6'], title: 'Speaking in Standard English', objective: 'Move between Creolese and Standard English according to audience and purpose.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-LS2'] },
+  { subject: 'english', strand: 'Listening and Speaking', grades: ['form1', 'form2', 'form3'], title: 'Presentation and Discussion', objective: 'Present a prepared talk and take part in a structured discussion.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-LS2'] },
 
-  // ── Science · Biology Basics ──
-  { subject: 'science', strand: 'Biology Basics', grades: ['k', '1st', '2nd'], title: 'Living and Non-Living', objective: 'Sort things into living and non-living and give reasons for the sort.', bloom: 'understand', difficulty: 1 },
-  { subject: 'science', strand: 'Biology Basics', grades: ['3rd', '4th', '5th'], title: 'Life Cycles and Inheritance', objective: 'Describe the life cycle of an organism and how traits pass to offspring.', bloom: 'understand', difficulty: 3, standards: ['3-LS1-1'] },
-  { subject: 'science', strand: 'Biology Basics', grades: ['6th', '7th'], title: 'Cells as the Unit of Life', objective: 'Provide evidence that living things are made of one or more cells.', bloom: 'analyze', difficulty: 4, standards: ['MS-LS1-1'] },
-  { subject: 'science', strand: 'Biology Basics', grades: ['7th', '8th'], title: 'Adaptation and Natural Selection', objective: 'Explain how genetic variation affects the chance of surviving in an environment.', bloom: 'analyze', difficulty: 5, standards: ['MS-LS4-4'] },
-  { subject: 'science', strand: 'Biology Basics', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Ecosystem Dynamics', objective: 'Model the cycling of matter and flow of energy through an ecosystem.', bloom: 'analyze', difficulty: 5, standards: ['HS-LS2-4'] },
+  // ── English Language · Reading and Comprehension ──
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['nursery1', 'nursery2'], title: 'Letter Sounds and Rhyme', objective: 'Match each letter to its most common sound and hear rhyme in words.', bloom: 'remember', difficulty: 1, standards: ['GY-ENG-RC1'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['grade1'], title: 'Blending and Decoding', objective: 'Blend sounds to read simple consonant-vowel-consonant words.', bloom: 'apply', difficulty: 2, standards: ['GY-ENG-RC1'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['grade1', 'grade2'], title: 'Sight Words and Simple Texts', objective: 'Read high-frequency words on sight and read a simple text with support.', bloom: 'apply', difficulty: 2, standards: ['GY-ENG-RC1'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['grade2', 'grade3'], title: 'Reading Fluency', objective: 'Read grade-level text accurately, at a steady pace and with expression.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-RC1'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['grade3', 'grade4'], title: 'Main Idea and Supporting Detail', objective: 'Identify the main idea of a passage and the details that support it.', bloom: 'analyze', difficulty: 3, standards: ['GY-ENG-RC2'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['grade4', 'grade5'], title: 'Sequence, Cause and Effect', objective: 'Follow the sequence of a text and explain what caused an event in it.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-RC2'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['grade5', 'grade6'], title: 'Inference and Figurative Language', objective: 'Draw an inference from a text and interpret similes, metaphors and idioms.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-RC3'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['form1', 'form2'], title: 'Comprehension of Longer Texts', objective: 'Answer literal, inferential and evaluative questions on an extended passage.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-RC2'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['form3', 'form4'], title: 'Summary Writing', objective: 'Reduce a passage to its main points in your own words within a word limit.', bloom: 'analyze', difficulty: 5, standards: ['GY-ENG-RC2'] },
+  { subject: 'english', strand: 'Reading and Comprehension', grades: ['form4', 'form5'], title: 'Analysing Argument and Register', objective: 'Analyse a writer’s purpose, tone and register and evaluate the argument made.', bloom: 'analyze', difficulty: 5, standards: ['GY-ENG-RC3'] },
 
-  // ── History · Civilizations ──
-  { subject: 'history', strand: 'Civilizations', grades: ['3rd', '4th', '5th'], title: 'Cause and Effect in History', objective: 'Explain probable causes and effects of events and developments.', bloom: 'analyze', difficulty: 3, standards: ['C3.D2.His.14.3-5'] },
-  { subject: 'history', strand: 'Civilizations', grades: ['6th', '7th'], title: 'Early Civilizations', objective: 'Compare how early civilizations organised food, trade and settlement.', bloom: 'analyze', difficulty: 4, standards: ['C3.D2.His.1.6-8'] },
-  { subject: 'history', strand: 'Civilizations', grades: ['7th', '8th'], title: 'African Empires and Trade', objective: 'Explain how trade routes shaped the economies of West African empires.', bloom: 'analyze', difficulty: 4, standards: ['C3.D2.Geo.4.6-8'] },
-  { subject: 'history', strand: 'Civilizations', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Historical Interpretation', objective: 'Evaluate competing historical interpretations using primary sources.', bloom: 'analyze', difficulty: 5 },
+  // ── English Language · Writing and Composition ──
+  { subject: 'english', strand: 'Writing and Composition', grades: ['nursery1', 'nursery2'], title: 'Letter Formation', objective: 'Form letters correctly and write your own name.', bloom: 'apply', difficulty: 1, standards: ['GY-ENG-WC1'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['grade1', 'grade2'], title: 'Writing Sentences', objective: 'Write a complete sentence with a capital letter and an end mark.', bloom: 'apply', difficulty: 2, standards: ['GY-ENG-WC1'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['grade2', 'grade3'], title: 'Writing a Paragraph', objective: 'Write a paragraph with a topic sentence, supporting detail and a closing.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-WC1'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['grade3', 'grade4'], title: 'Narrative Writing', objective: 'Write a story with a clear beginning, middle and end and descriptive detail.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-WC2'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['grade4', 'grade5'], title: 'Descriptive Writing', objective: 'Describe a place or person in Guyana using precise, sensory language.', bloom: 'apply', difficulty: 4, standards: ['GY-ENG-WC2'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['grade5', 'grade6'], title: 'Expository Writing', objective: 'Write an informative piece that explains a topic clearly and in order.', bloom: 'apply', difficulty: 4, standards: ['GY-ENG-WC2'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['form1', 'form2'], title: 'Planning, Drafting and Editing', objective: 'Plan, draft, revise and proofread an extended piece of writing.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-WC3'] },
+  { subject: 'english', strand: 'Writing and Composition', grades: ['form3', 'form4', 'form5'], title: 'Persuasive and Argument Writing', objective: 'Write an argument that states a position, supports it and answers the other side.', bloom: 'analyze', difficulty: 5, standards: ['GY-ENG-WC2'] },
 
-  // ── History · Government Types ──
-  { subject: 'history', strand: 'Government Types', grades: ['3rd', '4th', '5th'], title: 'Branches and Levels of Government', objective: 'Distinguish the powers of officials at different levels and branches of government.', bloom: 'understand', difficulty: 3, standards: ['C3.D2.Civ.1.3-5'] },
-  { subject: 'history', strand: 'Government Types', grades: ['6th', '7th', '8th'], title: 'Comparing Systems of Government', objective: 'Compare democratic, monarchic and authoritarian systems and their trade-offs.', bloom: 'analyze', difficulty: 4 },
-  { subject: 'history', strand: 'Government Types', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Rights, Law and Civic Action', objective: 'Analyse how constitutional rights are protected and contested through law.', bloom: 'analyze', difficulty: 5 },
+  // ── English Language · Grammar and Mechanics ──
+  { subject: 'english', strand: 'Grammar and Mechanics', grades: ['grade1', 'grade2'], title: 'Nouns and Verbs', objective: 'Identify nouns and verbs and use them correctly in a sentence.', bloom: 'remember', difficulty: 1, standards: ['GY-ENG-GM1'] },
+  { subject: 'english', strand: 'Grammar and Mechanics', grades: ['grade3', 'grade4'], title: 'Sentence Types and Punctuation', objective: 'Punctuate statements, questions and exclamations correctly.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-GM2'] },
+  { subject: 'english', strand: 'Grammar and Mechanics', grades: ['grade4', 'grade5'], title: 'Subject-Verb Agreement', objective: 'Make subjects and verbs agree in simple and compound sentences.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-GM1'] },
+  { subject: 'english', strand: 'Grammar and Mechanics', grades: ['grade5', 'grade6'], title: 'Tense and Consistency', objective: 'Use tense consistently across a piece of writing and correct shifts.', bloom: 'apply', difficulty: 4, standards: ['GY-ENG-GM1'] },
+  { subject: 'english', strand: 'Grammar and Mechanics', grades: ['form1', 'form2', 'form3'], title: 'Clauses and Sentence Variety', objective: 'Combine clauses to vary sentence structure and punctuate them correctly.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-GM2'] },
 
-  // ── History · Geography ──
-  { subject: 'history', strand: 'Geography', grades: ['3rd', '4th', '5th'], title: 'Reading Maps', objective: 'Use scale, key and compass directions to answer questions from a map.', bloom: 'apply', difficulty: 2 },
-  { subject: 'history', strand: 'Geography', grades: ['6th', '7th', '8th'], title: 'People and Environment', objective: 'Explain how physical geography shapes where and how people live.', bloom: 'analyze', difficulty: 4, standards: ['C3.D2.Geo.4.6-8'] },
-  { subject: 'history', strand: 'Geography', grades: ['9th', '10th', '11th', '12th', 'college'], title: 'Migration and Global Change', objective: 'Analyse the drivers and consequences of migration at a regional scale.', bloom: 'analyze', difficulty: 5 },
+  // ── English Language · Vocabulary and Spelling ──
+  { subject: 'english', strand: 'Vocabulary and Spelling', grades: ['grade1', 'grade2'], title: 'High-Frequency Words', objective: 'Read and spell the most common words on sight.', bloom: 'remember', difficulty: 1, standards: ['GY-ENG-VS1'] },
+  { subject: 'english', strand: 'Vocabulary and Spelling', grades: ['grade3', 'grade4'], title: 'Spelling Patterns', objective: 'Apply common spelling patterns and plural and tense rules.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-VS1'] },
+  { subject: 'english', strand: 'Vocabulary and Spelling', grades: ['grade4', 'grade5'], title: 'Context Clues', objective: 'Work out the meaning of an unknown word from the surrounding text.', bloom: 'apply', difficulty: 3, standards: ['GY-ENG-VS2'] },
+  { subject: 'english', strand: 'Vocabulary and Spelling', grades: ['grade5', 'grade6'], title: 'Roots, Prefixes and Suffixes', objective: 'Use word parts to work out the meaning of unfamiliar words.', bloom: 'apply', difficulty: 4, standards: ['GY-ENG-VS2'] },
+  { subject: 'english', strand: 'Vocabulary and Spelling', grades: ['form1', 'form2', 'form3'], title: 'Subject and Academic Vocabulary', objective: 'Acquire and use academic and subject vocabulary precisely.', bloom: 'analyze', difficulty: 4, standards: ['GY-ENG-VS2'] },
+
+  // ── Science · Living Things ──
+  { subject: 'science', strand: 'Living Things', grades: ['grade1', 'grade2'], title: 'Living and Non-Living', objective: 'Sort things into living and non-living and give reasons for the sort.', bloom: 'understand', difficulty: 1, standards: ['GY-SCI-LT1'] },
+  { subject: 'science', strand: 'Living Things', grades: ['grade3', 'grade4'], title: 'Classifying Plants and Animals', objective: 'Group plants and animals by observable features and name their parts.', bloom: 'understand', difficulty: 2, standards: ['GY-SCI-LT1'] },
+  { subject: 'science', strand: 'Living Things', grades: ['grade4', 'grade5'], title: 'Life Cycles and Habitats', objective: 'Describe the life cycle of a plant and an animal and the habitat each needs.', bloom: 'understand', difficulty: 3, standards: ['GY-SCI-LT2'] },
+  { subject: 'science', strand: 'Living Things', grades: ['grade5', 'grade6'], title: 'Adaptation in Guyana’s Habitats', objective: 'Explain how plants and animals are adapted to rainforest, savannah and coastal habitats.', bloom: 'analyze', difficulty: 4, standards: ['GY-SCI-LT2'] },
+  { subject: 'science', strand: 'Living Things', grades: ['form1', 'form2'], title: 'Cells as the Unit of Life', objective: 'Describe plant and animal cells and the job each part does.', bloom: 'understand', difficulty: 4, standards: ['GY-SCI-LT3'] },
+  { subject: 'science', strand: 'Living Things', grades: ['form2', 'form3'], title: 'Photosynthesis and Nutrition', objective: 'Explain how plants make food and how organisms obtain energy.', bloom: 'analyze', difficulty: 5, standards: ['GY-SCI-LT3'] },
+  { subject: 'science', strand: 'Living Things', grades: ['form4', 'form5'], title: 'Ecosystems and Energy Flow', objective: 'Model food chains, food webs and the cycling of matter in an ecosystem.', bloom: 'analyze', difficulty: 5, standards: ['GY-SCI-LT2'] },
+
+  // ── Science · The Human Body and Health ──
+  { subject: 'science', strand: 'The Human Body and Health', grades: ['grade1', 'grade2'], title: 'The Senses', objective: 'Name the five senses and the body part used for each.', bloom: 'remember', difficulty: 1, standards: ['GY-SCI-HB1'] },
+  { subject: 'science', strand: 'The Human Body and Health', grades: ['grade3', 'grade4'], title: 'Food and Healthy Eating', objective: 'Group local foods by nutrient and plan a balanced meal.', bloom: 'apply', difficulty: 2, standards: ['GY-SCI-HB2'] },
+  { subject: 'science', strand: 'The Human Body and Health', grades: ['grade5', 'grade6'], title: 'Body Systems', objective: 'Describe the digestive, circulatory and respiratory systems and what each does.', bloom: 'understand', difficulty: 4, standards: ['GY-SCI-HB1'] },
+  { subject: 'science', strand: 'The Human Body and Health', grades: ['form1', 'form2'], title: 'Digestion, Circulation and Respiration', objective: 'Explain how the body breaks down food and transports oxygen and nutrients.', bloom: 'analyze', difficulty: 4, standards: ['GY-SCI-HB1'] },
+  { subject: 'science', strand: 'The Human Body and Health', grades: ['form3', 'form4'], title: 'Disease, Immunity and Public Health', objective: 'Explain how disease spreads and how vaccination and hygiene prevent it.', bloom: 'analyze', difficulty: 5, standards: ['GY-SCI-HB2'] },
+
+  // ── Science · Matter and Materials ──
+  { subject: 'science', strand: 'Matter and Materials', grades: ['grade1', 'grade2'], title: 'Properties of Materials', objective: 'Describe and sort materials by properties such as hard, soft, rough and smooth.', bloom: 'understand', difficulty: 1, standards: ['GY-SCI-MM1'] },
+  { subject: 'science', strand: 'Matter and Materials', grades: ['grade3', 'grade4'], title: 'Solids, Liquids and Gases', objective: 'Describe the three states of matter and give examples of each.', bloom: 'understand', difficulty: 2, standards: ['GY-SCI-MM1'] },
+  { subject: 'science', strand: 'Matter and Materials', grades: ['grade5', 'grade6'], title: 'Changes of State and Mixtures', objective: 'Explain melting, evaporation and condensation, and separate simple mixtures.', bloom: 'apply', difficulty: 4, standards: ['GY-SCI-MM2'] },
+  { subject: 'science', strand: 'Matter and Materials', grades: ['form1', 'form2'], title: 'Elements, Compounds and Mixtures', objective: 'Distinguish elements, compounds and mixtures and give examples of each.', bloom: 'understand', difficulty: 4, standards: ['GY-SCI-MM1'] },
+  { subject: 'science', strand: 'Matter and Materials', grades: ['form3', 'form4'], title: 'Separation and Chemical Change', objective: 'Choose a separation technique for a mixture and identify a chemical change.', bloom: 'analyze', difficulty: 5, standards: ['GY-SCI-MM2'] },
+
+  // ── Science · Energy and Forces ──
+  { subject: 'science', strand: 'Energy and Forces', grades: ['grade3', 'grade4'], title: 'Pushes, Pulls and Movement', objective: 'Describe how pushes and pulls change the movement of an object.', bloom: 'understand', difficulty: 2, standards: ['GY-SCI-EF2'] },
+  { subject: 'science', strand: 'Energy and Forces', grades: ['grade5', 'grade6'], title: 'Light, Sound and Simple Machines', objective: 'Explain how light and sound travel and how simple machines make work easier.', bloom: 'apply', difficulty: 4, standards: ['GY-SCI-EF2'] },
+  { subject: 'science', strand: 'Energy and Forces', grades: ['form1', 'form2'], title: 'Forms of Energy and Energy Transfer', objective: 'Identify forms of energy and trace transfers through a system.', bloom: 'analyze', difficulty: 4, standards: ['GY-SCI-EF1'] },
+  { subject: 'science', strand: 'Energy and Forces', grades: ['form3', 'form4'], title: 'Forces, Motion and Electricity', objective: 'Investigate how force affects motion and build and describe simple circuits.', bloom: 'analyze', difficulty: 5, standards: ['GY-SCI-EF2'] },
+
+  // ── Science · Earth and Environment ──
+  { subject: 'science', strand: 'Earth and Environment', grades: ['grade1', 'grade2'], title: 'Weather and the Seasons', objective: 'Record daily weather and describe Guyana’s wet and dry seasons.', bloom: 'understand', difficulty: 1, standards: ['GY-SCI-EE1'] },
+  { subject: 'science', strand: 'Earth and Environment', grades: ['grade3', 'grade4'], title: 'Water and the Water Cycle', objective: 'Describe the water cycle and where the water in a community comes from.', bloom: 'understand', difficulty: 3, standards: ['GY-SCI-EE1'] },
+  { subject: 'science', strand: 'Earth and Environment', grades: ['grade5', 'grade6'], title: 'Guyana’s Natural Environment', objective: 'Describe Guyana’s rainforest, savannah, rivers and coastal plain and why they matter.', bloom: 'analyze', difficulty: 4, standards: ['GY-SCI-EE1'] },
+  { subject: 'science', strand: 'Earth and Environment', grades: ['form1', 'form2'], title: 'Conservation and Pollution', objective: 'Explain the causes of pollution and evaluate ways to conserve resources.', bloom: 'analyze', difficulty: 4, standards: ['GY-SCI-EE2'] },
+  { subject: 'science', strand: 'Earth and Environment', grades: ['form3', 'form4'], title: 'Climate, Flooding and Sea Defence', objective: 'Explain why Guyana’s coast floods and evaluate the sea defence response.', bloom: 'analyze', difficulty: 5, standards: ['GY-SCI-EE2'] },
+
+  // ── Science · Working Scientifically ──
+  { subject: 'science', strand: 'Working Scientifically', grades: ['grade3', 'grade4'], title: 'Observing and Recording', objective: 'Make careful observations and record them in a table or drawing.', bloom: 'apply', difficulty: 2, standards: ['GY-SCI-WS1'] },
+  { subject: 'science', strand: 'Working Scientifically', grades: ['grade5', 'grade6'], title: 'Measuring in Metric Units', objective: 'Measure length, mass, volume and temperature accurately and convert units.', bloom: 'apply', difficulty: 3, standards: ['GY-SCI-WS1'] },
+  { subject: 'science', strand: 'Working Scientifically', grades: ['form1', 'form2', 'form3'], title: 'Planning a Fair Test', objective: 'Identify variables, plan a fair test and draw a conclusion from the evidence.', bloom: 'analyze', difficulty: 4, standards: ['GY-SCI-WS2'] },
+
+  // ── Social Studies · Our Country Guyana ──
+  { subject: 'social', strand: 'Our Country Guyana', grades: ['grade3', 'grade4'], title: 'The Ten Regions', objective: 'Locate Guyana’s ten regions and name the main town in each.', bloom: 'remember', difficulty: 2, standards: ['GY-SOC-CG1'] },
+  { subject: 'social', strand: 'Our Country Guyana', grades: ['grade4', 'grade5'], title: 'Rivers, Coast and Hinterland', objective: 'Describe Guyana’s main rivers and the difference between coast and hinterland.', bloom: 'understand', difficulty: 3, standards: ['GY-SOC-CG1'] },
+  { subject: 'social', strand: 'Our Country Guyana', grades: ['grade5', 'grade6'], title: 'Peoples and Cultures of Guyana', objective: 'Describe the six peoples of Guyana and the festivals and foods they share.', bloom: 'understand', difficulty: 3, standards: ['GY-SOC-CG2'] },
+  { subject: 'social', strand: 'Our Country Guyana', grades: ['form1', 'form2'], title: 'National Symbols and Identity', objective: 'Explain the meaning of Guyana’s national symbols, motto and pledge.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-CG2'] },
+
+  // ── Social Studies · Our Heritage and History ──
+  { subject: 'social', strand: 'Our Heritage and History', grades: ['grade3', 'grade4'], title: 'The Indigenous Peoples', objective: 'Describe the nine indigenous peoples of Guyana and how they live.', bloom: 'understand', difficulty: 2, standards: ['GY-SOC-HH1'] },
+  { subject: 'social', strand: 'Our Heritage and History', grades: ['grade4', 'grade5'], title: 'Colonisation and the Plantation', objective: 'Explain Dutch and British settlement and life on the sugar plantation.', bloom: 'understand', difficulty: 3, standards: ['GY-SOC-HH2'] },
+  { subject: 'social', strand: 'Our Heritage and History', grades: ['grade5', 'grade6'], title: 'Emancipation and Indentureship', objective: 'Explain emancipation in 1838 and the indentureship that followed.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-HH2'] },
+  { subject: 'social', strand: 'Our Heritage and History', grades: ['grade6', 'form1'], title: 'The Road to Independence', objective: 'Trace the steps to independence in 1966 and republic status in 1970.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-HH2'] },
+  { subject: 'social', strand: 'Our Heritage and History', grades: ['form2', 'form3'], title: 'Building the Nation since 1966', objective: 'Describe the main developments in Guyana since independence.', bloom: 'analyze', difficulty: 5, standards: ['GY-SOC-HH2'] },
+  { subject: 'social', strand: 'Our Heritage and History', grades: ['form4', 'form5'], title: 'Using Historical Sources', objective: 'Evaluate primary and secondary sources and explain cause and consequence.', bloom: 'analyze', difficulty: 5, standards: ['GY-SOC-HH3'] },
+
+  // ── Social Studies · Geography and Environment ──
+  { subject: 'social', strand: 'Geography and Environment', grades: ['grade3', 'grade4'], title: 'Map Skills', objective: 'Use scale, key and compass directions to answer questions from a map.', bloom: 'apply', difficulty: 2, standards: ['GY-SOC-GE1'] },
+  { subject: 'social', strand: 'Geography and Environment', grades: ['grade5', 'grade6'], title: 'Landforms, Climate and Settlement', objective: 'Explain how landforms and climate shape where people live in Guyana.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-GE2'] },
+  { subject: 'social', strand: 'Geography and Environment', grades: ['form1', 'form2'], title: 'Population and Migration', objective: 'Describe Guyana’s population distribution and the causes of migration.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-GE2'] },
+  { subject: 'social', strand: 'Geography and Environment', grades: ['form3', 'form4'], title: 'Sustainable Development', objective: 'Evaluate development choices against their environmental and social cost.', bloom: 'analyze', difficulty: 5, standards: ['GY-SOC-GE2'] },
+
+  // ── Social Studies · Civics and Government ──
+  { subject: 'social', strand: 'Civics and Government', grades: ['grade3', 'grade4'], title: 'Rules, Rights and Responsibilities', objective: 'Explain why rules exist and describe the rights and duties of a pupil.', bloom: 'understand', difficulty: 2, standards: ['GY-SOC-CV1'] },
+  { subject: 'social', strand: 'Civics and Government', grades: ['grade5', 'grade6'], title: 'Local and National Government', objective: 'Describe what regional and national government each do for citizens.', bloom: 'understand', difficulty: 3, standards: ['GY-SOC-CV1'] },
+  { subject: 'social', strand: 'Civics and Government', grades: ['form1', 'form2'], title: 'Democracy and the Rule of Law', objective: 'Explain elections, the branches of government and the rule of law.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-CV2'] },
+  { subject: 'social', strand: 'Civics and Government', grades: ['form3', 'form4'], title: 'Citizenship and Civic Action', objective: 'Evaluate how citizens can take action on an issue in their community.', bloom: 'analyze', difficulty: 5, standards: ['GY-SOC-CV2'] },
+
+  // ── Social Studies · Resources and Economic Activity ──
+  { subject: 'social', strand: 'Resources and Economic Activity', grades: ['grade4', 'grade5'], title: 'Guyana’s Natural Resources', objective: 'Name Guyana’s main natural resources and where each is found.', bloom: 'remember', difficulty: 3, standards: ['GY-SOC-RE1'] },
+  { subject: 'social', strand: 'Resources and Economic Activity', grades: ['grade5', 'grade6'], title: 'Farming, Fishing, Mining and Forestry', objective: 'Describe Guyana’s main economic activities and the work people do in them.', bloom: 'understand', difficulty: 3, standards: ['GY-SOC-RE1'] },
+  { subject: 'social', strand: 'Resources and Economic Activity', grades: ['form1', 'form2'], title: 'Industry, Trade and the Oil Economy', objective: 'Explain how oil, trade and industry are changing Guyana’s economy.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-RE2'] },
+  { subject: 'social', strand: 'Resources and Economic Activity', grades: ['form3', 'form4'], title: 'Work, Enterprise and Livelihoods', objective: 'Evaluate career and enterprise options and the skills each needs.', bloom: 'analyze', difficulty: 5, standards: ['GY-SOC-RE2'] },
+
+  // ── Social Studies · The Caribbean and the Wider World ──
+  { subject: 'social', strand: 'The Caribbean and the Wider World', grades: ['grade6', 'form1'], title: 'Guyana and the Caribbean', objective: 'Locate Guyana’s Caribbean neighbours and describe what they share.', bloom: 'understand', difficulty: 3, standards: ['GY-SOC-CW1'] },
+  { subject: 'social', strand: 'The Caribbean and the Wider World', grades: ['form2', 'form3'], title: 'CARICOM and Regional Integration', objective: 'Explain what CARICOM does and how regional cooperation benefits Guyana.', bloom: 'analyze', difficulty: 4, standards: ['GY-SOC-CW2'] },
+  { subject: 'social', strand: 'The Caribbean and the Wider World', grades: ['form4', 'form5'], title: 'Guyana in the Global Economy', objective: 'Evaluate Guyana’s trade and diplomatic links beyond the Caribbean.', bloom: 'analyze', difficulty: 5, standards: ['GY-SOC-CW2'] },
 ];
 
 function slug(text: string): string {
@@ -174,9 +242,11 @@ function buildCatalog(): CurriculumModule[] {
   const modules: CurriculumModule[] = [];
 
   for (const grade of GRADE_ORDER) {
-    const forGrade = SEEDS.filter(s => s.grades.includes(grade));
+    // A module can only be taught if the grade offers that subject.
+    const offered = gradeById(grade)?.subjects ?? [];
+    const forGrade = SEEDS.filter(s => s.grades.includes(grade) && offered.includes(s.subject));
 
-    // Group by strand so sequence numbers run per subject+strand.
+    // Group by strand so sequence numbers run per subject and strand.
     const byStrand = new Map<string, ModuleSeed[]>();
     for (const seed of forGrade) {
       const key = `${seed.subject}::${seed.strand}`;
@@ -235,7 +305,7 @@ function buildCatalog(): CurriculumModule[] {
   return modules;
 }
 
-/** Every module for every grade. Built once at import; deterministic. */
+/** Every module for every year of schooling. Built once at import; deterministic. */
 export const CURRICULUM: CurriculumModule[] = buildCatalog();
 
 export function modulesForGrade(grade: string): CurriculumModule[] {
@@ -249,11 +319,46 @@ export function modulesForStrand(grade: string, subject: string, strand: string)
   ).sort((a, b) => a.sequence - b.sequence);
 }
 
+/**
+ * The teaching pathway for one strand: the modules from `backGrades` years below
+ * the pupil's grade up to their own grade, in teaching order.
+ *
+ * A plan teaches at the instructional level, not the enrolled level. A Grade 6
+ * pupil sitting at 30% in Number Concepts needs the Grade 4 and Grade 5 modules
+ * of that strand before the Grade 6 one, and this is the ladder that provides
+ * them. Where a strand only appears at the pupil's own grade the pathway is just
+ * that grade's modules.
+ */
+export function strandPathway(
+  grade: string,
+  subject: string,
+  strand: string,
+  backGrades = 2,
+): CurriculumModule[] {
+  const gi = GRADE_ORDER.indexOf(grade);
+  if (gi === -1) return [];
+  const from = Math.max(0, gi - backGrades);
+
+  // A module taught across several years exists once per year. On a pathway the
+  // pupil should meet that lesson once, at the earliest year it appears — that is
+  // the instructional entry point.
+  const pathway: CurriculumModule[] = [];
+  const seen = new Set<string>();
+  for (let g = from; g <= gi; g++) {
+    for (const mod of modulesForStrand(GRADE_ORDER[g], subject, strand)) {
+      if (seen.has(mod.title)) continue;
+      seen.add(mod.title);
+      pathway.push(mod);
+    }
+  }
+  return pathway;
+}
+
 export function getModule(id: string): CurriculumModule | undefined {
   return CURRICULUM.find(m => m.id === id);
 }
 
-/** Distinct `subject::strand` keys taught at a grade. */
+/** Distinct `subject::strand` pairs taught at a grade. */
 export function strandsForGrade(grade: string): { subject: string; strand: string }[] {
   const seen = new Set<string>();
   const out: { subject: string; strand: string }[] = [];

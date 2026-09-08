@@ -1,6 +1,6 @@
 # LeapIQ
 
-An adaptive AI educational platform that personalizes learning from Pre-K through College. LeapIQ uses Anthropic Claude to generate curriculum-aligned lessons, quizzes, and assessments that adapt in real time to each student's performance level and learning pace.
+An adaptive learning platform for the **Ministry of Education, Guyana**, covering Nursery 1 through Form 5. LeapIQ imports a school's assessment data, turns it into per-strand baselines, builds an individualised plan against Guyana's national curriculum, and keeps that plan current as each pupil masters their assigned modules.
 
 Built by [JMCB Technology Group](https://jmcbtechgroup.com).
 
@@ -17,8 +17,9 @@ Built by [JMCB Technology Group](https://jmcbtechgroup.com).
 - **Document-to-Quiz** -- Upload study materials (text or images) and generate quiz questions automatically
 - **Multi-Role Dashboards** -- Separate views for Students, Educators, and Parents
 - **Progress Visualization** -- Recharts-powered charts showing accuracy, XP, and learning velocity over time
-- **50-State Standards** -- Questions aligned to each state's educational standards (Common Core, NGSS, state-specific)
-- **Grade Range Coverage** -- Pre-K through College with age-appropriate content and vocabulary
+- **Guyana National Curriculum** -- Strands follow the NCERD curriculum guides; content is written toward the Grade Two and Grade Four assessments, the NGSA at Grade 6, the Grade Nine assessment at Form 3, and CSEC at Form 5
+- **Eleven Education Districts** -- The ten administrative regions plus Georgetown, with the four hinterland regions flagged
+- **Grade Range Coverage** -- Nursery 1 through Form 5 with age-appropriate content and vocabulary
 
 ## Tech Stack
 
@@ -119,6 +120,10 @@ mark sheet -> ingest -> baselines -> plan (goals + assigned modules) -> checkpoi
 Four pure modules, each independently tested: `lib/ingest.ts`, `lib/baseline.ts`,
 `lib/iep-builder.ts`, `lib/iep-progress.ts`, drawing on the catalogue in
 `data/curriculum.ts`. See [the plan pipeline guide](docs/plan-pipeline.md).
+
+Plans teach at the **instructional level**, not the enrolled level: a Grade 6 pupil at 31%
+in Number Concepts is assigned the Grade 4 and Grade 5 modules of that strand before the
+Grade 6 one.
 
 To see it end to end: Educator Dashboard -> Assessment Intake -> Load Sample -> Analyse Data.
 

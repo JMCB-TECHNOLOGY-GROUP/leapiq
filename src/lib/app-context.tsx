@@ -21,7 +21,7 @@ interface AppState {
 interface AppContextValue extends AppState {
   login: (user: Student & { role: string }) => void;
   logout: () => void;
-  addStudent: (name: string, grade: string, state: string) => Student;
+  addStudent: (name: string, grade: string, district: string) => Student;
   recordSession: (session: Omit<Session, 'id'>) => void;
   setParentPin: (pin: string) => void;
   setEducatorPin: (pin: string) => void;
@@ -74,8 +74,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState(s => ({ ...s, user: null }));
   }, []);
 
-  const addStudent = useCallback((name: string, grade: string, stateCode: string) => {
-    const student = storage.addStudent(name, grade, stateCode);
+  const addStudent = useCallback((name: string, grade: string, district: string) => {
+    const student = storage.addStudent(name, grade, district);
     setState(s => ({ ...s, students: [...s.students, student] }));
     return student;
   }, []);
