@@ -1,0 +1,784 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>LeapIQ National Rollout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:ital,wght@0,300..700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  /* Paper with a faint green cast — a school ledger, not a cream art board. */
+  --paper:#F1F4EF; --surface:#FBFCFA; --surface-2:#E9EEE7;
+  --rule:#CFD8CB; --rule-soft:#E0E7DD;
+  --ink:#15201A; --ink-2:#354338; --muted:#69796D;
+  --accent:#00805F; --accent-quiet:#00805F1F;
+  --gold:#8A6A16;
+  --s1:#00805F; --s2:#AD7C12; --s3:#2F7FBF; --s4:#C0432F; --reserve:#9AA79D;
+  --good:#1F7A4D; --warn:#9A5E05; --crit:#A3372B;
+  --chip:#E4EDE6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#0D1411; --surface:#131C18; --surface-2:#18231D;
+    --rule:#27352C; --rule-soft:#1E2A23;
+    --ink:#E7EDE8; --ink-2:#C2CFC5; --muted:#8B9C90;
+    --accent:#4FB79A; --accent-quiet:#4FB79A26;
+    --gold:#D8AE4E;
+    --s1:#1E9C7E; --s2:#B8891F; --s3:#3B8ACB; --s4:#D05745; --reserve:#6E7E73;
+    --good:#5FCB8E; --warn:#E0A54A; --crit:#E4776A;
+    --chip:#1C2A22;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#0D1411; --surface:#131C18; --surface-2:#18231D;
+  --rule:#27352C; --rule-soft:#1E2A23;
+  --ink:#E7EDE8; --ink-2:#C2CFC5; --muted:#8B9C90;
+  --accent:#4FB79A; --accent-quiet:#4FB79A26;
+  --gold:#D8AE4E;
+  --s1:#1E9C7E; --s2:#B8891F; --s3:#3B8ACB; --s4:#D05745; --reserve:#6E7E73;
+  --good:#5FCB8E; --warn:#E0A54A; --crit:#E4776A;
+  --chip:#1C2A22;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:15.5px; line-height:1.62; -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px 96px}
+.col{max-width:70ch}
+
+/* ── masthead ── */
+header.masthead{
+  border-bottom:2px solid var(--ink);
+  padding:44px 0 22px; margin-bottom:8px;
+}
+.kicker{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent); font-weight:600;
+}
+h1{
+  font-family:"Newsreader", Georgia, "Times New Roman", serif;
+  font-weight:500; font-size:clamp(34px, 5.2vw, 54px); line-height:1.04;
+  letter-spacing:-.015em; margin:14px 0 12px; text-wrap:balance; max-width:18ch;
+}
+.standfirst{font-size:18px; color:var(--ink-2); max-width:62ch; margin:0 0 26px}
+.byline{
+  display:flex; flex-wrap:wrap; gap:8px 26px;
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
+  color:var(--muted); letter-spacing:.02em;
+}
+.byline b{color:var(--ink-2); font-weight:500}
+
+/* ── section furniture ── */
+section{padding-top:52px}
+h2{
+  font-family:"Newsreader", Georgia, serif; font-weight:500;
+  font-size:clamp(24px, 3vw, 31px); line-height:1.18; letter-spacing:-.01em;
+  margin:0 0 6px; text-wrap:balance;
+}
+h3{
+  font-size:15px; font-weight:700; margin:30px 0 8px; letter-spacing:.005em;
+}
+.eyebrow{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted); font-weight:600; margin-bottom:12px;
+  padding-bottom:9px; border-bottom:1px solid var(--rule);
+}
+p{margin:0 0 16px}
+.lede{font-size:17px; color:var(--ink-2)}
+.note{font-size:13.5px; color:var(--muted)}
+a{color:var(--accent); text-decoration-thickness:1px; text-underline-offset:2px}
+
+/* ── figures row ── */
+.figures{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+  gap:1px; background:var(--rule); border:1px solid var(--rule); margin:28px 0 4px;
+}
+.fig{background:var(--surface); padding:18px 20px 16px}
+.fig .n{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:29px; font-weight:600; letter-spacing:-.02em; line-height:1;
+  font-variant-numeric:tabular-nums; color:var(--ink);
+}
+.fig .n small{font-size:16px; font-weight:500; color:var(--muted); letter-spacing:0}
+.fig .l{font-size:12.5px; color:var(--muted); margin-top:7px; line-height:1.4}
+
+/* ── tables ── */
+.tablewrap{overflow-x:auto; margin:22px 0 8px; border:1px solid var(--rule); background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:560px}
+caption{
+  text-align:left; font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  padding:13px 16px 11px; border-bottom:1px solid var(--rule); font-weight:600;
+}
+th,td{text-align:left; padding:10px 16px; border-bottom:1px solid var(--rule-soft); vertical-align:top}
+thead th{
+  font-size:11.5px; text-transform:uppercase; letter-spacing:.07em;
+  color:var(--muted); font-weight:600; background:var(--surface-2);
+  border-bottom:1px solid var(--rule); white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+td.num, th.num{text-align:right; font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+tr.total td{border-top:1px solid var(--ink); font-weight:700; background:var(--surface-2)}
+td b{font-weight:600}
+.dim{color:var(--muted)}
+
+/* ── phases: a real sequence, so it is numbered ── */
+.phases{display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule); margin:24px 0}
+.phase{
+  background:var(--surface); display:grid; grid-template-columns:56px 1fr;
+  gap:0 18px; padding:18px 20px;
+}
+.phase .idx{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:12px; font-weight:600;
+  color:var(--accent); padding-top:3px; letter-spacing:.06em;
+}
+.phase h4{margin:0 0 4px; font-size:16px; font-weight:700}
+.phase .when{
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11.5px;
+  color:var(--muted); margin-bottom:8px;
+}
+.phase p{margin:0 0 10px; font-size:14.5px; color:var(--ink-2)}
+.phase .stats{display:flex; flex-wrap:wrap; gap:6px}
+.chip{
+  background:var(--chip); color:var(--ink-2); font-size:11.5px; font-weight:600;
+  padding:3px 9px; border-radius:2px;
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+}
+
+/* ── charts ── */
+figure{margin:26px 0 8px; background:var(--surface); border:1px solid var(--rule); padding:20px 20px 16px}
+figure .ftitle{font-size:15px; font-weight:700; margin-bottom:2px}
+figure .fsub{font-size:13px; color:var(--muted); margin-bottom:16px}
+figcaption{font-size:12.5px; color:var(--muted); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule-soft)}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; margin-bottom:14px}
+.legend span{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-2)}
+.legend i{width:11px; height:11px; border-radius:2px; display:block; flex:none}
+.chartbox{position:relative; overflow-x:auto}
+svg{display:block; max-width:100%}
+.tip{
+  position:absolute; pointer-events:none; opacity:0; transform:translate(-50%,-115%);
+  background:var(--ink); color:var(--paper); padding:7px 10px; border-radius:3px;
+  font-size:12px; line-height:1.45; white-space:nowrap; z-index:5;
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;
+  transition:opacity .1s;
+}
+.tip b{font-family:"Public Sans", sans-serif; font-weight:600}
+
+/* ── callout ── */
+.callout{
+  border-left:3px solid var(--accent); background:var(--surface);
+  padding:18px 22px; margin:26px 0; border-top:1px solid var(--rule);
+  border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);
+}
+.callout p:last-child{margin-bottom:0}
+.callout strong{color:var(--ink)}
+
+/* ── lists ── */
+ul.tight{margin:0 0 16px; padding-left:20px}
+ul.tight li{margin-bottom:7px}
+ul.tight li::marker{color:var(--accent)}
+
+.sev{font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; white-space:nowrap}
+.sev.hi{color:var(--crit)} .sev.md{color:var(--warn)} .sev.lo{color:var(--good)}
+
+footer{margin-top:64px; padding-top:24px; border-top:2px solid var(--ink); font-size:13px; color:var(--muted)}
+footer p{margin:0 0 10px}
+
+@media (max-width:620px){
+  .phase{grid-template-columns:1fr; gap:6px}
+  .phase .idx{padding-top:0}
+}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="kicker">Proposal · Ministry of Education, Guyana</div>
+  <h1>Taking LeapIQ to every school in Guyana</h1>
+  <p class="standfirst">An accelerated plan: <b>national primary coverage inside twelve months</b>, complete coverage of all 1,155 public schools by month&nbsp;30, at the same five-year cost as the eighteen-month plan it replaces. What changes is the shape of the spend, not the size of it.</p>
+  <div class="byline">
+    <span><b>Prepared by</b> JMCB Technology Group</span>
+    <span><b>For</b> Ministry of Education, Guyana</span>
+    <span><b>Date</b> September 2026</span>
+    <span><b>Status</b> Draft for discussion</span>
+  </div>
+</header>
+
+<div class="figures">
+  <div class="fig"><div class="n">12<small> months</small></div><div class="l">To national primary coverage — all 436 primary schools, 50,000 pupils. Was 18</div></div>
+  <div class="fig"><div class="n">US$7.5<small>M</small></div><div class="l">Five-year total cost of ownership — unchanged from the eighteen-month plan</div></div>
+  <div class="fig"><div class="n">US$10.72</div><div class="l">Per pupil-year of coverage, down from US$14.83 — the same money reaches more children sooner</div></div>
+  <div class="fig"><div class="n">0.26<small>%</small></div><div class="l">Of the 2026 education budget in the peak year, up from 0.19% — the cost of compression</div></div>
+</div>
+<p class="note">Learner and staffing figures are planning estimates; their basis is set out under <a href="#assumptions">Assumptions and sources</a>.</p>
+
+<section id="scope">
+  <div class="eyebrow">01 — Scope</div>
+  <h2>What “national” actually means</h2>
+  <div class="col">
+    <p class="lede">The platform today is a working demonstration: one class, one browser, data that lives on a single device. Nothing about it is wrong; everything about it is small. The gap between that and a national system is not features — it is scale, offline operation, identity, and assurance.</p>
+    <p>Guyana runs its schools through eleven education districts: the ten administrative regions plus Georgetown as District 11. Four of those regions are hinterland — Barima-Waini, Cuyuni-Mazaruni, Potaro-Siparuni and Upper Takutu-Upper Essequibo — and they set the hardest constraints on the design. A system that only works on the coast is not a national system.</p>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <caption>The estate to be served</caption>
+      <thead>
+        <tr><th>Level</th><th class="num">Schools</th><th class="num">Learners</th><th class="num">Teachers</th><th>Terminal assessment</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nursery (Years 1–2)</td><td class="num">471</td><td class="num">~30,000</td><td class="num">~1,750</td><td class="dim">—</td></tr>
+        <tr><td>Primary (Grades 1–6)</td><td class="num">436</td><td class="num">~100,000</td><td class="num">~4,200</td><td>Grade 2 · Grade 4 · <b>NGSA</b> at Grade 6</td></tr>
+        <tr><td>Secondary (Forms 1–5)</td><td class="num">242</td><td class="num">~72,000</td><td class="num">~4,500</td><td>Grade 9 at Form 3 · <b>CSEC</b> at Form 5</td></tr>
+        <tr><td>Special education</td><td class="num">6</td><td class="num">~700</td><td class="num">~90</td><td class="dim">—</td></tr>
+        <tr class="total"><td>Total</td><td class="num">1,155</td><td class="num">~200,000</td><td class="num">~10,500</td><td class="dim">11 education districts</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <p><strong>1,033 schools have internet; roughly 120 do not.</strong> The Ministry and the NDMA have connected 1,033 schools — 385 nursery, 489 primary and every secondary school — including 365 hinterland and remote schools in the last two years, 158 of them over low-earth-orbit satellite. That is a strong base and it is not full coverage, and in many hinterland schools power is as intermittent as the link.</p>
+    <p>So the platform is designed offline-first, not offline-tolerant. A school with no connection for a fortnight loses nothing.</p>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="eyebrow">02 — Re-architecture</div>
+  <h2>What has to change to run this nationally</h2>
+  <div class="col">
+    <p class="lede">Six things change. The pedagogy engine — ingest, baselines, plan, mastery — does not: it is already written as pure functions over plain data, which is exactly what lets it run unchanged on a teacher's tablet in Mahdia with no signal.</p>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Demonstration → national platform</caption>
+      <thead>
+        <tr><th>Layer</th><th>Today</th><th>National</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Storage</b></td>
+          <td class="dim">Browser localStorage, one device</td>
+          <td>Managed Postgres, row-level security by district and school, plus an append-only event log per pupil</td>
+          <td class="dim">A pupil's record must follow them between teachers, schools and regions</td>
+        </tr>
+        <tr>
+          <td><b>Sync</b></td>
+          <td class="dim">None</td>
+          <td>Offline-first client with a local database and a durable outbound queue; events keyed by device and sequence so replay is idempotent</td>
+          <td class="dim">Weeks offline must merge cleanly, not conflict</td>
+        </tr>
+        <tr>
+          <td><b>Identity</b></td>
+          <td class="dim">A PIN held in the browser</td>
+          <td>Roster-backed accounts from the Ministry's school census; staff via SSO, pupils by school plus card or PIN — no email addresses for children</td>
+          <td class="dim">Accountability, and child-safe by construction</td>
+        </tr>
+        <tr>
+          <td><b>Curriculum content</b></td>
+          <td class="dim">A single bundled source file</td>
+          <td>Versioned NCERD content packs, signed and dated to an academic year, shipped with the app and updated in the background</td>
+          <td class="dim">NCERD owns the curriculum; the platform must not fork it</td>
+        </tr>
+        <tr>
+          <td><b>AI services</b></td>
+          <td class="dim">Generated live, per quiz</td>
+          <td>Item banks generated in batch and reviewed by Guyanese teachers, shipped in the content packs; live tutoring quota-capped and online-only</td>
+          <td class="dim">Fifteen times cheaper, works offline, and every item has been seen by a teacher</td>
+        </tr>
+        <tr>
+          <td><b>Reporting</b></td>
+          <td class="dim">One class on one screen</td>
+          <td>School → district → Ministry rollups, with NGSA and CSEC readiness by strand</td>
+          <td class="dim">The Ministry's question is regional disparity, not one child</td>
+        </tr>
+        <tr>
+          <td><b>Assurance</b></td>
+          <td class="dim">None</td>
+          <td>Data-protection impact assessment, penetration test, access audit log, defined retention</td>
+          <td class="dim">This is children's data under the Data Protection Act 2023</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="ai">
+  <div class="eyebrow">03 — The decision that sets the running cost</div>
+  <h2>Generate the questions once, not two million times</h2>
+  <div class="col">
+    <p class="lede">The single largest lever on the annual bill is where the AI runs. Generating questions live, on demand, for every pupil in every session is the obvious design and it is the wrong one — at national scale it costs more than the entire rest of the platform combined, and it stops working the moment the link drops.</p>
+    <p>Generating the item bank in batch — once per academic year, per grade, per subject, per strand — puts a Guyanese teacher between the model and the child, ships the questions inside the offline content pack, and costs almost nothing to run.</p>
+  </div>
+
+  <figure>
+    <div class="ftitle">Annual AI spend at 200,000 learners</div>
+    <div class="fsub">Same curriculum coverage, two architectures</div>
+    <div class="chartbox">
+      <div class="tip" id="tip2"></div>
+      <svg id="aichart" viewBox="0 0 720 190" role="img" aria-label="Live per-session generation costs about US$1,037,000 a year; pre-built item banks with a capped live tutor cost about US$70,000 a year."></svg>
+    </div>
+    <figcaption>Assumes 21.6 million practice sessions a year (200,000 learners × 3 sessions × 36 teaching weeks) at roughly 1,000 input and 3,000 output tokens each, priced at published Sonnet-class rates. The batch figure covers a 62,400-item national bank, its yearly regeneration, and a quota-capped live tutor.</figcaption>
+  </figure>
+
+  <div class="callout">
+    <p><strong>US$967,000 a year, saved by a design choice rather than a discount.</strong> It also removes the dependency that would have made the platform useless in exactly the schools that need it most.</p>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="eyebrow">04 — Cost</div>
+  <h2>Five years, build to steady state</h2>
+  <div class="col">
+    <p class="lede">People are the cost. Infrastructure and AI together never exceed ten per cent of a year's spend — the money goes into engineers, curriculum specialists, and the eleven district coordinators who make the thing actually get used.</p>
+  </div>
+
+  <figure>
+    <div class="ftitle">Cost profile by year</div>
+    <div class="fsub">US$ thousands, four work streams plus a 12% reserve — front-loaded, then handed over</div>
+    <div class="legend" id="legend"></div>
+    <div class="chartbox">
+      <div class="tip" id="tip1"></div>
+      <svg id="costchart" viewBox="0 0 720 330" role="img" aria-label="Stacked columns of annual cost by work stream: US$2.30 million in year one, US$2.22 million in year two, then falling to US$1.62 million, US$0.78 million and US$0.58 million as the programme hands over to the Ministry."></svg>
+    </div>
+    <figcaption>Year 1 now carries build, pilot <em>and</em> national primary coverage. Full national lands in year 3, and years 4 and 5 are Ministry-operated steady state rather than programme delivery — which is where the money for the acceleration comes from. Full figures in the table below.</figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <caption>Five-year cost of ownership, accelerated · US$ thousands</caption>
+      <thead>
+        <tr>
+          <th>Work stream</th>
+          <th class="num">Y1 build, pilot<br>&amp; primary core</th>
+          <th class="num">Y2 primary<br>&amp; lower sec.</th>
+          <th class="num">Y3 full national<br>+ handover</th>
+          <th class="num">Y4 steady<br>state</th>
+          <th class="num">Y5 steady<br>state</th>
+          <th class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><b>People</b> <span class="dim">— engineering, product, curriculum, district coordinators, support</span></td><td class="num">1,180</td><td class="num">1,150</td><td class="num">860</td><td class="num">420</td><td class="num">300</td><td class="num">3,910</td></tr>
+        <tr><td><b>Curriculum &amp; content</b> <span class="dim">— NCERD digitisation, item banks, teacher review</span></td><td class="num">500</td><td class="num">210</td><td class="num">70</td><td class="num">30</td><td class="num">20</td><td class="num">830</td></tr>
+        <tr><td><b>Training &amp; rollout</b> <span class="dim">— cascade training, district workshops, hinterland logistics</span></td><td class="num">280</td><td class="num">470</td><td class="num">340</td><td class="num">90</td><td class="num">40</td><td class="num">1,220</td></tr>
+        <tr><td><b>Technology &amp; assurance</b> <span class="dim">— hosting, AI services, DPIA, penetration testing, audit</span></td><td class="num">96</td><td class="num">150</td><td class="num">172</td><td class="num">160</td><td class="num">160</td><td class="num">738</td></tr>
+        <tr><td><b>Reserve</b> <span class="dim">— 12% contingency</span></td><td class="num">247</td><td class="num">238</td><td class="num">173</td><td class="num">84</td><td class="num">62</td><td class="num">804</td></tr>
+        <tr class="total"><td>Total (US$000)</td><td class="num">2,303</td><td class="num">2,218</td><td class="num">1,615</td><td class="num">784</td><td class="num">582</td><td class="num">7,502</td></tr>
+        <tr class="total"><td>Total (GY$ million)</td><td class="num">481</td><td class="num">464</td><td class="num">338</td><td class="num">164</td><td class="num">122</td><td class="num">1,568</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Converted at GY$209 to US$1. Excludes pupil devices — see <a href="#assumptions">Assumptions</a>.</p>
+
+  <h3>Where the technology money goes</h3>
+  <div class="tablewrap">
+    <table>
+      <caption>Annual running cost at full national scale · US$</caption>
+      <thead><tr><th>Item</th><th class="num">Per year</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Managed Postgres, high availability</td><td class="num">14,400</td><td class="dim">~500 GB, per-district row-level security</td></tr>
+        <tr><td>Application hosting</td><td class="num">18,000</td><td class="dim">Request volume is low because the client works offline</td></tr>
+        <tr><td>Object storage and CDN</td><td class="num">7,200</td><td class="dim">Content pack distribution to 1,155 schools</td></tr>
+        <tr><td>Event ingestion and queueing</td><td class="num">6,000</td><td class="dim">Sync bursts when hinterland schools reconnect</td></tr>
+        <tr><td>Observability, backup, disaster recovery</td><td class="num">8,400</td><td class="dim">Includes an in-region restore target</td></tr>
+        <tr><td>Non-production environments</td><td class="num">6,000</td><td class="dim">Staging and a Ministry acceptance environment</td></tr>
+        <tr><td>AI — item bank generation and refresh</td><td class="num">3,000</td><td class="dim">62,400 items, regenerated yearly</td></tr>
+        <tr><td>AI — live tutor, quota-capped</td><td class="num">60,000</td><td class="dim">Hard budget cap, secondary first</td></tr>
+        <tr><td>AI — marking and analysis assists</td><td class="num">7,000</td><td class="dim">Free-text and document intake</td></tr>
+        <tr><td>Security assurance</td><td class="num">30,000</td><td class="dim">Annual penetration test and audit</td></tr>
+        <tr class="total"><td>Total</td><td class="num">160,000</td><td class="dim">US$0.80 per learner per year</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="rollout">
+  <div class="eyebrow">05 — Rollout</div>
+  <h2>Four phases in thirty months, national primary in twelve</h2>
+  <div class="col">
+    <p class="lede">Every phase still ends with a result the Ministry can check independently, and none of them commits the country to the next. The compression comes from running things <em>in parallel</em>, not from cutting them: the pilot widens instead of lengthening, district training waves run four at a time instead of two, and handover starts a year earlier.</p>
+  </div>
+
+  <div class="phases">
+    <div class="phase">
+      <div class="idx">00</div>
+      <div>
+        <h4>Foundation</h4>
+        <div class="when">Months 1–2 · compressed from 3</div>
+        <p>Curriculum digitisation with NCERD, so every strand and objective in the platform is the Ministry's own. Data-sharing agreement and data-protection impact assessment signed before a single pupil record moves. School census extract loaded. Compressed by running the legal track and the curriculum track concurrently rather than in sequence — the DPIA does not depend on the strand mapping.</p>
+        <div class="stats"><span class="chip">No pupil data yet</span><span class="chip">NCERD + MoE data office</span></div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="idx">01</div>
+      <div>
+        <h4>Pilot — two coastal districts, two hinterland</h4>
+        <div class="when">Months 3–7 · Grades 4–6 · compressed from 6 months to 5</div>
+        <p><b>Forty</b> schools across Regions 4, 6, 8 and 9 — twice the original size in five sixths of the time. Statistical power comes from the number of schools, not the number of months, so widening buys back most of what shortening costs. The measure is unchanged: whether plan-driven teaching moves Grade 6 strand mastery against a matched comparison group, and whether the offline client survives real hinterland conditions for a full term.</p>
+        <div class="stats"><span class="chip">40 schools</span><span class="chip">12,000 pupils</span><span class="chip">520 teachers</span><span class="chip">4 districts</span></div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="idx">02</div>
+      <div>
+        <h4>Primary core, national</h4>
+        <div class="when">Months 8–12 · Grades 4–6 · compressed from 9 months to 5</div>
+        <p>All primary schools, the three years that carry the Grade 4 assessment and the NGSA. This is the twelve-month milestone — the Ministry’s first national picture of strand-level mastery by region, a full academic year earlier than the base plan. Delivered by running four district training waves simultaneously instead of two, which needs eleven district coordinators in post from month 1 rather than phased in across year 2.</p>
+        <div class="stats"><span class="chip">436 schools</span><span class="chip">50,000 pupils</span><span class="chip">2,100 teachers</span><span class="chip">11 districts</span></div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="idx">03</div>
+      <div>
+        <h4>Full primary and lower secondary</h4>
+        <div class="when">Months 13–21 · Grades 1–6, Forms 1–3</div>
+        <p>Extends down to Grade 1 — where reading is won or lost — and up through the Grade 9 assessment year. Aligns with the Ministry's own commitment to universal secondary education.</p>
+        <div class="stats"><span class="chip">~900 schools</span><span class="chip">150,000 pupils</span><span class="chip">7,500 teachers</span></div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="idx">04</div>
+      <div>
+        <h4>National, Nursery 1 to Form 5</h4>
+        <div class="when">Months 22–30 · complete twelve months early</div>
+        <p>Complete coverage including nursery and the CSEC years. Handover of operations to Ministry staff begins at month 22 and completes with the rollout, so years 4 and 5 are support and maintenance rather than programme delivery.</p>
+        <div class="stats"><span class="chip">1,155 schools</span><span class="chip">200,000 pupils</span><span class="chip">10,500 teachers</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Teacher training is the rollout</h3>
+  <div class="col">
+    <p>Ten and a half thousand teachers cannot be trained centrally, and the platform is worthless to a teacher who does not trust it. Training runs as a cascade: master trainers drawn from serving Guyanese teachers, then a lead in each school, then everyone. Hinterland districts get in-person delivery and a travel budget that reflects what it actually costs to reach Regions 1, 8 and 9 — that premium is the largest single line in the rollout budget and it is not negotiable.</p>
+    <p>Acceleration hits this line hardest. Running four district waves at once means <b>120 master trainers instead of 60</b>, and a trainer who would have covered three districts in sequence now covers one. That is the whole of the +US$80,000 on the training line: the same teachers trained, by more people, in less time.</p>
+  </div>
+
+
+  <h3>Base plan against accelerated</h3>
+  <div class="tablewrap">
+    <table>
+      <caption>What changes, and what does not</caption>
+      <thead>
+        <tr><th>&nbsp;</th><th>Base plan</th><th>Accelerated</th><th class="num">Change</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>National primary coverage</b> <span class="dim">Grades 4–6, 436 schools</span></td><td class="dim">Month 18</td><td><b>Month 12</b></td><td class="num">6 months earlier</td></tr>
+        <tr><td><b>Complete national coverage</b> <span class="dim">Nursery 1 – Form 5</span></td><td class="dim">Month 42</td><td><b>Month 30</b></td><td class="num">12 months earlier</td></tr>
+        <tr><td><b>Pilot</b></td><td class="dim">20 schools, 2 districts, 6 months</td><td>40 schools, 4 districts, 5 months</td><td class="num">2× the evidence</td></tr>
+        <tr><td><b>Five-year total</b></td><td class="dim">US$7.50M</td><td>US$7.50M</td><td class="num">unchanged</td></tr>
+        <tr><td><b>Peak-year spend</b></td><td class="dim">US$1.69M · GY$353M</td><td>US$2.30M · GY$481M</td><td class="num">+36%</td></tr>
+        <tr><td><b>Peak-year share of education budget</b></td><td class="dim">0.19%</td><td>0.26%</td><td class="num">+0.07 pts</td></tr>
+        <tr><td><b>Learners covered, end of year 1</b></td><td class="dim">6,000</td><td>50,000</td><td class="num">8× </td></tr>
+        <tr><td><b>Pupil-years of coverage over five years</b></td><td class="dim">506,000</td><td>700,000</td><td class="num">+38%</td></tr>
+        <tr class="total"><td>Cost per pupil-year of coverage</td><td class="dim">US$14.83</td><td>US$10.72</td><td class="num">−28%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Pupil-years are the average of start- and end-of-year coverage, summed across the five years. It is the fairest single comparator because it prices the calendar as well as the cash: a plan that reaches a child in year 1 buys four years of that child's schooling, a plan that reaches them in year 3 buys two.</p>
+
+  <h3>Where the money comes from</h3>
+  <div class="col">
+    <p>Nothing is cut. The acceleration is funded by ending programme-level delivery twelve months earlier: handover starts at month 22 instead of month 34, so years 4 and 5 fall from US$1.69M and US$1.45M to US$784,000 and US$582,000. That releases US$1.77M, which pays for the bigger year-1 and year-2 teams.</p>
+    <p>Two lines go up and stay up. <b>Training rises US$80,000</b> because parallel waves cannot reuse a trainer across districts. <b>Technology rises US$78,000</b> because full-scale hosting, AI item banks and the annual penetration test all arrive a year sooner. Both are paid for out of the same US$140,000 that comes off the People line.</p>
+  </div>
+</section>
+
+<section id="value">
+  <div class="eyebrow">06 — Proportion</div>
+  <h2>What this costs against what Guyana already spends</h2>
+  <div class="col">
+    <p>Budget 2026 allocates GY$183.6 billion to education. At its most expensive year this programme is now <b>GY$481 million</b> — just over a quarter of one per cent of a single year's education spending. The acceleration raises the peak-year call on the budget from 0.19% to 0.26%, and in exchange puts a national instrument for seeing which child is behind, in which strand, in which region, into the Ministry's hands a full academic year sooner.</p>
+  </div>
+  <div class="figures">
+    <div class="fig"><div class="n">0.26<small>%</small></div><div class="l">Of the 2026 education budget, in the peak year — year 1</div></div>
+    <div class="fig"><div class="n">GY$2,240</div><div class="l">Per pupil-year of coverage — down from GY$3,100</div></div>
+    <div class="fig"><div class="n">2.6<small>%</small></div><div class="l">Of the GY$85,000 per child already paid in direct support</div></div>
+    <div class="fig"><div class="n">US$0.80</div><div class="l">Per learner per year to run the technology itself</div></div>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="eyebrow">07 — Risks</div>
+  <h2>What could stop this working</h2>
+  <div class="tablewrap">
+    <table>
+      <caption>Principal risks and how each is answered</caption>
+      <thead><tr><th>Risk</th><th>Severity</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>Year-1 cash flow</b> <span class="dim">— introduced by the acceleration</span></td>
+          <td><span class="sev hi">High</span></td>
+          <td>The five-year total is unchanged, but year 1 rises from GY$266M to GY$481M. This is the binding constraint on the accelerated plan: if the Ministry cannot appropriate GY$481M in the first year, the schedule cannot hold no matter what the five-year figure says. Fallback is a hybrid — accelerate the pilot and primary core, let phases 3 and 4 run to the base timetable.</td>
+        </tr>
+        <tr>
+          <td><b>Less time between pilot and scale</b> <span class="dim">— introduced by the acceleration</span></td>
+          <td><span class="sev hi">High</span></td>
+          <td>The base plan left nine months between pilot end and national primary completion; the accelerated plan leaves five. If the pilot surfaces something structural there is less room to fix it before scale. Mitigated by doubling the pilot to forty schools and four districts, so problems surface in more conditions and sooner within the window.</td>
+        </tr>
+        <tr>
+          <td><b>Reserve held flat while risk rises</b> <span class="dim">— the weakest part of this plan</span></td>
+          <td><span class="sev md">Medium</span></td>
+          <td>The reserve stays at 12% and US$804,000 in total, unchanged from the base plan, while the delivery it covers is compressed and therefore riskier. We would rather carry 15% across years 1 and 2 — about US$140,000 more. Held at 12% only because the instruction was to keep the total fixed; if it is exceeded, the overrun comes out of year 4 and year 5 steady state, which is a real reduction in support, not a free buffer.</td>
+        </tr>
+        <tr>
+          <td><b>Connectivity and power in hinterland schools</b></td>
+          <td><span class="sev hi">High</span></td>
+          <td>Offline-first by design, not as a fallback. The plan engine runs entirely on-device; a school can operate a full term with no link. Content packs ship with the app.</td>
+        </tr>
+        <tr>
+          <td><b>Teacher capacity and trust</b></td>
+          <td><span class="sev hi">High</span></td>
+          <td>Cascade training with serving Guyanese teachers as master trainers; a district coordinator each; the plan always shows the evidence behind every goal so a teacher can disagree with it.</td>
+        </tr>
+        <tr>
+          <td><b>Device access</b></td>
+          <td><span class="sev md">Medium</span></td>
+          <td>Designed for shared and low-end Android devices, one per teacher rather than one per pupil. Rides the Ministry's existing smart-classroom and Whole-School Network programmes rather than duplicating them.</td>
+        </tr>
+        <tr>
+          <td><b>Children's data protection</b></td>
+          <td><span class="sev hi">High</span></td>
+          <td>DPIA before any pupil record moves; data residency agreed with the Ministry; no email identities for children; access audit log; defined retention and deletion.</td>
+        </tr>
+        <tr>
+          <td><b>Curriculum drift from NCERD</b></td>
+          <td><span class="sev md">Medium</span></td>
+          <td>NCERD owns the strands and objectives; the platform loads them as versioned content, and every generated item is reviewed by a Guyanese teacher before it reaches a child.</td>
+        </tr>
+        <tr>
+          <td><b>Over-reliance on the model</b></td>
+          <td><span class="sev md">Medium</span></td>
+          <td>The plan engine is deterministic and testable — no model decides a baseline, a goal or a mastery judgement. AI writes practice items and tutors; it does not assess.</td>
+        </tr>
+        <tr>
+          <td><b>Sustainability after the contract</b></td>
+          <td><span class="sev md">Medium</span></td>
+          <td>Handover begins in year 4, not year 5. Ministry staff are embedded in the team from year 2, and the running cost after handover is the US$160,000 technology line, not the programme cost.</td>
+        </tr>
+        <tr>
+          <td><b>Pilot fails to show a lift</b></td>
+          <td><span class="sev lo">Accepted</span></td>
+          <td>Then the Ministry does not proceed. The phase structure exists so that this decision costs the pilot and its wind-down rather than the full programme. Acceleration raises that exposure: the decision now sits at month 7 inside a US$2.30M year, so the wider forty-school pilot matters as much for the evidence as for the speed.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="asks">
+  <div class="eyebrow">08 — What we need</div>
+  <h2>Six things from the Ministry to begin</h2>
+  <div class="col">
+    <ul class="tight">
+      <li><b>The NCERD curriculum guides</b>, with official objective numbering. The platform's strands already follow the published guides; the official codes replace our internal references without any strand changing.</li>
+      <li><b>A school census extract</b> — schools, rosters and staff — as the identity source of truth, refreshed each term.</li>
+      <li><b>A data-sharing agreement and DPIA sign-off</b> under the Data Protection Act 2023, before any pupil record is transferred.</li>
+      <li><b>Assessment results feeds</b> for the Grade 2, Grade 4, Grade 9 and NGSA assessments, so baselines start from what the Ministry already knows rather than from a fresh diagnostic.</li>
+      <li><b>A named counterpart in each of the eleven education districts</b>, to pair with our coordinators.</li>
+      <li><b>Per-school connectivity status from the NDMA</b>, so we know which schools must run fully offline and plan the content-pack logistics accordingly.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="assumptions">
+  <div class="eyebrow">09 — Basis</div>
+  <h2>Assumptions and sources</h2>
+  <div class="col">
+    <p>Everything above rests on public figures and stated planning assumptions. Where a number is an estimate it is marked as one, and the Ministry's own data will replace it in Phase 0.</p>
+
+    <h3>Figures taken from public sources</h3>
+    <ul class="tight">
+      <li><b>School counts</b> — 471 nursery, 436 primary, 242 secondary and 6 special schools, from the Ministry's published statistics (2017, the most recent public digest). New construction since then means the real total is higher, which raises rollout cost but not per-pupil cost.</li>
+      <li><b>Connectivity</b> — 1,033 schools connected, 385 nursery and 489 primary among them, with 365 hinterland and remote schools connected in the last two years and 158 over low-earth-orbit satellite.</li>
+      <li><b>Education budget</b> — GY$183.6 billion allocated to the sector in Budget 2026; GY$85,000 per child in direct support including the “Because We Care” and uniform grants and the new transportation grant.</li>
+      <li><b>Structure and assessments</b> — Nursery, Grades 1–6 and Forms 1–5 across eleven education districts, with the NGSA at Grade 6 and CSEC at Form 5.</li>
+    </ul>
+
+    <h3>Planning estimates, to be replaced with Ministry data</h3>
+    <ul class="tight">
+      <li><b>200,000 learners</b> — derived from the ~115,000 nursery and primary children in the national school feeding programme plus secondary enrolment, and cross-checked against the school-age share of population. Treat as ±10%.</li>
+      <li><b>10,500 teachers</b> — derived from published pupil–teacher ratios by level, not from a staff register.</li>
+      <li><b>Salary costs</b> — blended Guyana-market rates for a locally-based team. A team staffed from overseas would cost roughly three times as much and would not build local capacity.</li>
+      <li><b>AI pricing</b> — published Sonnet-class rates at the time of writing, with no volume discount assumed.</li>
+    </ul>
+
+    <h3>Explicitly excluded</h3>
+    <ul class="tight">
+      <li><b>Pupil and teacher devices.</b> The costing assumes the Ministry's existing smart-classroom, Whole-School Network and device programmes supply the hardware. If devices are added to scope, budget roughly US$110 per rugged Android tablet at one per teacher — about US$1.15 million once, plus replacement at a five-year cycle.</li>
+      <li><b>Connectivity charges</b>, which sit with the NDMA.</li>
+      <li><b>Any Ministry staff time</b>, which is real but not billed here.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p><b>JMCB Technology Group</b> — prepared for the Ministry of Education, Guyana. This is a draft proposal for discussion, not a Ministry publication and not a commitment by either party.</p>
+  <p>Costs are indicative and denominated in United States dollars, converted at GY$209 to US$1. Figures will be restated against Ministry data during Phase 0.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var STREAMS = [
+    { key: 'People',                   color: 'var(--s1)',      v: [1180, 1150, 860, 420, 300] },
+    { key: 'Curriculum & content',     color: 'var(--s2)',      v: [ 500,  210,  70,  30,  20] },
+    { key: 'Training & rollout',       color: 'var(--s3)',      v: [ 280,  470, 340,  90,  40] },
+    { key: 'Technology & assurance',   color: 'var(--s4)',      v: [  96,  150, 172, 160, 160] },
+    { key: 'Reserve (12%)',            color: 'var(--reserve)', v: [ 247,  238, 173,  84,  62] }
+  ];
+  var YEARS = ['Y1', 'Y2', 'Y3', 'Y4', 'Y5'];
+  var SUB = ['pilot + primary core', 'primary + lower sec.', 'full national', 'steady state', 'steady state'];
+  var TOTALS = [2303, 2218, 1615, 784, 582];
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs, text) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function usd(k) { return '$' + k.toLocaleString('en-US') + 'k'; }
+  /* Data-end rounding: only the end the value reaches, never the baseline. */
+  function roundedTop(x, y, w, h, r) {
+    r = Math.min(r, h, w / 2);
+    return 'M' + x + ' ' + (y + h) + 'V' + (y + r) + 'a' + r + ' ' + r + ' 0 0 1 ' + r + ' ' + -r +
+           'h' + (w - 2 * r) + 'a' + r + ' ' + r + ' 0 0 1 ' + r + ' ' + r + 'V' + (y + h) + 'Z';
+  }
+  function roundedRight(x, y, w, h, r) {
+    r = Math.min(r, w, h / 2);
+    return 'M' + x + ' ' + y + 'h' + (w - r) + 'a' + r + ' ' + r + ' 0 0 1 ' + r + ' ' + r +
+           'v' + (h - 2 * r) + 'a' + r + ' ' + r + ' 0 0 1 ' + -r + ' ' + r + 'H' + x + 'Z';
+  }
+
+  /* ── legend ── */
+  var legend = document.getElementById('legend');
+  STREAMS.forEach(function (s) {
+    var sp = document.createElement('span');
+    var i = document.createElement('i');
+    i.style.background = s.color;
+    sp.appendChild(i);
+    sp.appendChild(document.createTextNode(s.key));
+    legend.appendChild(sp);
+  });
+
+  /* ── stacked cost columns ── */
+  var svg = document.getElementById('costchart');
+  var W = 720, H = 330, L = 58, R = 16, T = 18, B = 62;
+  var plotW = W - L - R, plotH = H - T - B;
+  var MAX = 2400;
+  var y = function (v) { return T + plotH - (v / MAX) * plotH; };
+
+  [0, 800, 1600, 2400].forEach(function (t) {
+    svg.appendChild(el('line', { x1: L, x2: W - R, y1: y(t), y2: y(t),
+      stroke: 'var(--rule-soft)', 'stroke-width': 1 }));
+    svg.appendChild(el('text', { x: L - 10, y: y(t) + 4, 'text-anchor': 'end',
+      fill: 'var(--muted)', 'font-size': 11,
+      'font-family': 'IBM Plex Mono, monospace' }, t === 0 ? '0' : '$' + (t / 1000).toFixed(1) + 'M'));
+  });
+
+  var slot = plotW / YEARS.length, bw = Math.min(78, slot - 46);
+  var tip1 = document.getElementById('tip1');
+  var box1 = svg.parentNode;
+
+  YEARS.forEach(function (yr, i) {
+    var cx = L + slot * i + slot / 2, x0 = cx - bw / 2, acc = 0;
+
+    STREAMS.forEach(function (s) {
+      var v = s.v[i];
+      var top = y(acc + v), bot = y(acc);
+      var h = Math.max(1, bot - top - 2); /* 2px surface gap between segments */
+      var isTop = s === STREAMS[STREAMS.length - 1];
+      var r = isTop
+        ? el('path', { d: roundedTop(x0, top, bw, h, 4), fill: s.color })
+        : el('rect', { x: x0, y: top, width: bw, height: h, fill: s.color });
+      r.style.cursor = 'default';
+      r.addEventListener('mouseenter', function () {
+        var box = box1.getBoundingClientRect();
+        tip1.innerHTML = '<b>' + s.key + '</b><br>' + yr + ' &middot; ' + usd(v);
+        tip1.style.left = (cx / W) * box.width - (box1.scrollLeft || 0) + 'px';
+        tip1.style.top = ((top + h / 2) / H) * box.height + 'px';
+        tip1.style.opacity = '1';
+      });
+      r.addEventListener('mouseleave', function () { tip1.style.opacity = '0'; });
+      svg.appendChild(r);
+      acc += v;
+    });
+
+    /* total, direct-labelled — the number the reader came for */
+    svg.appendChild(el('text', { x: cx, y: y(acc) - 9, 'text-anchor': 'middle',
+      fill: 'var(--ink)', 'font-size': 12.5, 'font-weight': 600,
+      'font-family': 'IBM Plex Mono, monospace' }, '$' + (TOTALS[i] / 1000).toFixed(2) + 'M'));
+
+    svg.appendChild(el('text', { x: cx, y: H - B + 22, 'text-anchor': 'middle',
+      fill: 'var(--ink)', 'font-size': 13, 'font-weight': 600,
+      'font-family': 'Public Sans, sans-serif' }, yr));
+    svg.appendChild(el('text', { x: cx, y: H - B + 39, 'text-anchor': 'middle',
+      fill: 'var(--muted)', 'font-size': 11,
+      'font-family': 'Public Sans, sans-serif' }, SUB[i]));
+  });
+
+  svg.appendChild(el('line', { x1: L, x2: W - R, y1: y(0), y2: y(0),
+    stroke: 'var(--rule)', 'stroke-width': 1 }));
+
+  /* ── AI architecture comparison ── */
+  var s2 = document.getElementById('aichart');
+  var AI = [
+    { label: 'Generated live, per session', v: 1037, note: '21.6M sessions a year' },
+    { label: 'Pre-built item banks + capped tutor', v: 70, note: 'ships offline, teacher-reviewed' }
+  ];
+  var AW = 720, AH = 190, AL = 250, AR = 74, AT = 26;
+  var barH = 40, gap = 34, AMAX = 1100;
+  var ax = function (v) { return AL + (v / AMAX) * (AW - AL - AR); };
+  var tip2 = document.getElementById('tip2');
+  var box2 = s2.parentNode;
+
+  [0, 550, 1100].forEach(function (t) {
+    s2.appendChild(el('line', { x1: ax(t), x2: ax(t), y1: AT - 8, y2: AT + 2 * barH + gap + 8,
+      stroke: 'var(--rule-soft)', 'stroke-width': 1 }));
+    s2.appendChild(el('text', { x: ax(t), y: AT + 2 * barH + gap + 26, 'text-anchor': 'middle',
+      fill: 'var(--muted)', 'font-size': 11,
+      'font-family': 'IBM Plex Mono, monospace' }, t === 0 ? '0' : '$' + (t / 1000).toFixed(2) + 'M'));
+  });
+
+  AI.forEach(function (d, i) {
+    var yy = AT + i * (barH + gap);
+    var fill = i === 0 ? 'var(--s4)' : 'var(--s1)';
+    var w = Math.max(2, ax(d.v) - AL);
+    var r = el('path', { d: roundedRight(AL, yy, w, barH, 4), fill: fill });
+    r.addEventListener('mouseenter', function () {
+      tip2.innerHTML = '<b>' + d.label + '</b><br>US$' + (d.v * 1000).toLocaleString('en-US') + ' / year';
+      var box = box2.getBoundingClientRect();
+      tip2.style.left = ((AL + w / 2) / AW) * box.width + 'px';
+      tip2.style.top = ((yy + barH / 2) / AH) * box.height + 'px';
+      tip2.style.opacity = '1';
+    });
+    r.addEventListener('mouseleave', function () { tip2.style.opacity = '0'; });
+    s2.appendChild(r);
+
+    s2.appendChild(el('text', { x: AL - 14, y: yy + 19, 'text-anchor': 'end',
+      fill: 'var(--ink)', 'font-size': 13, 'font-weight': 600,
+      'font-family': 'Public Sans, sans-serif' }, d.label));
+    s2.appendChild(el('text', { x: AL - 14, y: yy + 35, 'text-anchor': 'end',
+      fill: 'var(--muted)', 'font-size': 11.5,
+      'font-family': 'Public Sans, sans-serif' }, d.note));
+
+    s2.appendChild(el('text', { x: ax(d.v) + 10, y: yy + barH / 2 + 5,
+      fill: 'var(--ink)', 'font-size': 13, 'font-weight': 600,
+      'font-family': 'IBM Plex Mono, monospace' },
+      i === 0 ? '$1.04M' : '$70k'));
+  });
+})();
+</script>
+
+</body></html>
