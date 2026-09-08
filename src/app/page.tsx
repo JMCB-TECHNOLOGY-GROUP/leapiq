@@ -12,6 +12,8 @@ import Quiz from '@/components/Quiz';
 import Tutor from '@/components/Tutor';
 import ReviewMode from '@/components/ReviewMode';
 import DocUpload from '@/components/DocUpload';
+import PlanIntake from '@/components/PlanIntake';
+import PlanView from '@/components/PlanView';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -85,6 +87,7 @@ export default function Home() {
         onTutor={(subject) => setScreen('tutor-' + subject)}
         onReview={() => setScreen('review')}
         onUpload={() => setScreen('upload')}
+        onPlan={() => setScreen('plan-' + user.id)}
         onLogout={() => { logout(); setScreen('landing'); }}
       />
     );
@@ -126,7 +129,38 @@ export default function Home() {
 
   // Educator dashboard
   if (screen === 'edu-dash') {
-    return <EducatorDashboard onLogout={() => { logout(); setScreen('landing'); }} />;
+    return (
+      <EducatorDashboard
+        onLogout={() => { logout(); setScreen('landing'); }}
+        onIntake={() => setScreen('intake')}
+        onOpenPlan={(studentId) => setScreen('plan-' + studentId)}
+      />
+    );
+  }
+
+  // Assessment intake — educators only
+  if (screen === 'intake' && user?.role === 'educator') {
+    return (
+      <PlanIntake
+        onBack={() => setScreen('edu-dash')}
+        onOpenPlan={(studentId) => setScreen('plan-' + studentId)}
+      />
+    );
+  }
+
+  // Learning plan. Pupils see their own, read-only; educators can mark checkpoints.
+  const planMatch = screen.match(/^plan-(.+)$/);
+  if (planMatch) {
+    const isOwnPlan = user?.role === 'student' && user.id === planMatch[1];
+    if (isOwnPlan || user?.role === 'educator') {
+      return (
+        <PlanView
+          studentId={planMatch[1]}
+          readOnly={isOwnPlan}
+          onBack={() => setScreen(user?.role === 'educator' ? 'edu-dash' : 'dashboard')}
+        />
+      );
+    }
   }
 
   return null;

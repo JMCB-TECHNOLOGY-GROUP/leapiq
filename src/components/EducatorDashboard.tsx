@@ -5,11 +5,17 @@ import { useApp } from '@/lib/app-context';
 import { SUBJECTS, GRADE_CONFIG, STATES, STANDARDS_MAP } from '@/lib/constants';
 import { getSubjectPerformance, identifyGaps, calculateVelocity } from '@/lib/adaptive-engine';
 import { getMasteredCount, getLearningCount } from '@/lib/storage';
+import { summarisePlan } from '@/lib/iep-progress';
+import { catalogCoverage } from '@/data/curriculum';
 import ProgressCharts from './ProgressCharts';
 
-export default function EducatorDashboard({ onLogout }: { onLogout: () => void }) {
-  const { students, sessions } = useApp();
-  const [view, setView] = useState<'overview' | 'standards' | 'student'>('overview');
+export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
+  onLogout: () => void;
+  onIntake: () => void;
+  onOpenPlan: (studentId: string) => void;
+}) {
+  const { students, sessions, plans, assignments } = useApp();
+  const [view, setView] = useState<'overview' | 'standards' | 'student' | 'materials'>('overview');
   const [selectedStudent, setSelectedStudent] = useState<string | null>(null);
   const [selectedSubject, setSelectedSubject] = useState('math');
 
@@ -27,6 +33,7 @@ export default function EducatorDashboard({ onLogout }: { onLogout: () => void }
       velocity: calculateVelocity(ss),
       mastered: getMasteredCount(s.id),
       learning: getLearningCount(s.id),
+      plan: plans.find(p => p.studentId === s.id) ?? null,
     };
   });
 
@@ -96,6 +103,44 @@ export default function EducatorDashboard({ onLogout }: { onLogout: () => void }
     );
   }
 
+  // Pre-loaded class materials, by grade
+  if (view === 'materials') {
+    const coverage = catalogCoverage().filter(c => c.modules > 0);
+    return (
+      <div className="min-h-screen bg-gray-50 pb-8">
+        <div className="bg-indigo-700 px-5 py-4 flex items-center gap-3">
+          <button onClick={() => setView('overview')} className="text-white/80" aria-label="Back">&larr;</button>
+          <h1 className="text-white font-black flex-1">Class Materials</h1>
+        </div>
+        <div className="px-5 pt-4 max-w-2xl mx-auto">
+          <p className="text-sm text-gray-600 mb-4">
+            Every grade ships with a module catalogue, so a plan can assign work the moment
+            assessment data lands. Goals draw from the row matching the pupil&rsquo;s grade.
+          </p>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            {coverage.map(c => (
+              <div key={c.grade} className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-50 last:border-0">
+                <span className="text-xs font-bold text-gray-900 w-24 flex-shrink-0">
+                  {GRADE_CONFIG[c.grade]?.label ?? c.grade}
+                </span>
+                <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${Math.min(100, c.modules * 6)}%` }} />
+                </div>
+                <span className="text-[11px] text-gray-500 w-32 text-right flex-shrink-0">
+                  {c.modules} modules · {c.subjects} subjects
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-400 mt-3">
+            {coverage.reduce((a, c) => a + c.modules, 0)} modules across {coverage.length} grades,
+            {' '}{Math.round(coverage.reduce((a, c) => a + c.minutes, 0) / 60)} hours of instruction.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Individual student view
   if (view === 'student' && selectedStudent) {
     const student = students.find(s => s.id === selectedStudent);
@@ -108,6 +153,19 @@ export default function EducatorDashboard({ onLogout }: { onLogout: () => void }
           <span className="text-white/60 text-xs">{GRADE_CONFIG[student?.grade || '5th']?.label}</span>
         </div>
         <div className="px-5 pt-4">
+          {plans.some(p => p.studentId === selectedStudent) && (
+            <button
+              onClick={() => onOpenPlan(selectedStudent)}
+              className="w-full bg-white border border-indigo-200 rounded-2xl p-3 mb-4 flex items-center gap-3 hover:border-indigo-400"
+            >
+              <span className="text-xl" aria-hidden>&#128203;</span>
+              <div className="text-left">
+                <div className="font-semibold text-sm text-gray-900">Open learning plan</div>
+                <div className="text-gray-400 text-[11px]">Goals, baselines and assigned modules</div>
+              </div>
+              <span className="text-gray-300 ml-auto" aria-hidden>&rarr;</span>
+            </button>
+          )}
           <ProgressCharts sessions={studentSessions} studentId={selectedStudent} />
         </div>
       </div>
@@ -148,6 +206,24 @@ export default function EducatorDashboard({ onLogout }: { onLogout: () => void }
 
       <div className="px-5 -mt-3">
         {/* Quick actions */}
+        <button onClick={onIntake} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-3.5 mt-3 flex items-center gap-3 shadow-lg shadow-indigo-500/20 active:scale-98">
+          <span className="text-xl" aria-hidden>&#128200;</span>
+          <div className="text-left">
+            <div className="font-bold text-sm">Assessment Intake</div>
+            <div className="text-white/70 text-[11px]">Import scores, set baselines, build plans</div>
+          </div>
+          <span className="text-white/60 ml-auto" aria-hidden>&rarr;</span>
+        </button>
+
+        <button onClick={() => setView('materials')} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 flex items-center gap-3 active:scale-98 hover:border-indigo-300">
+          <span className="text-xl" aria-hidden>&#128218;</span>
+          <div className="text-left">
+            <div className="font-semibold text-sm text-gray-900">Class Materials</div>
+            <div className="text-gray-400 text-[11px]">Modules pre-loaded for every grade</div>
+          </div>
+          <span className="text-gray-300 ml-auto" aria-hidden>&rarr;</span>
+        </button>
+
         <button onClick={() => setView('standards')} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 flex items-center gap-3 active:scale-98 hover:border-indigo-300">
           <span className="text-xl">&#128203;</span>
           <div className="text-left">
@@ -188,9 +264,16 @@ export default function EducatorDashboard({ onLogout }: { onLogout: () => void }
                   <div className={`font-bold text-sm ${s.accuracy >= 70 ? 'text-green-600' : s.accuracy >= 50 ? 'text-amber-600' : 'text-red-500'}`}>
                     {s.accuracy}%
                   </div>
-                  {s.gaps.length > 0 && (
+                  {s.plan ? (
+                    <div className="text-[10px] text-indigo-500 font-bold">
+                      {(() => {
+                        const sum = summarisePlan(s.plan, assignments);
+                        return `plan · ${sum.met}/${sum.goals} met`;
+                      })()}
+                    </div>
+                  ) : s.gaps.length > 0 ? (
                     <div className="text-[10px] text-red-400">{s.gaps.length} gaps</div>
-                  )}
+                  ) : null}
                 </div>
               </button>
             ))}

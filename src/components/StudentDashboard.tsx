@@ -4,15 +4,18 @@ import { useApp } from '@/lib/app-context';
 import { SUBJECTS, GRADE_CONFIG, STATES } from '@/lib/constants';
 import { getDueQuestions } from '@/lib/storage';
 import { getSubjectPerformance, identifyGaps, calculateVelocity } from '@/lib/adaptive-engine';
+import { activeQueue, summarisePlan } from '@/lib/iep-progress';
+import { getModule } from '@/data/curriculum';
 
-export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, onLogout }: {
+export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, onLogout, onPlan }: {
   onQuiz: (subject: string) => void;
   onTutor: (subject: string) => void;
   onReview: () => void;
   onUpload: () => void;
   onLogout: () => void;
+  onPlan: () => void;
 }) {
-  const { user, sessions } = useApp();
+  const { user, sessions, getPlanForStudent, getAssignmentsForStudent } = useApp();
   if (!user) return null;
 
   const studentSessions = sessions.filter(s => s.studentId === user.id);
@@ -23,6 +26,10 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
   const stateName = STATES.find(s => s.code === user.state)?.name || '';
   const gaps = identifyGaps(studentSessions);
   const velocity = calculateVelocity(studentSessions);
+  const plan = getPlanForStudent(user.id);
+  const assignments = getAssignmentsForStudent(user.id);
+  const upNext = plan ? activeQueue(plan, assignments) : [];
+  const planSummary = plan ? summarisePlan(plan, assignments) : null;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
@@ -58,6 +65,44 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
       </div>
 
       <div className="px-5 -mt-3">
+        {/* Learning plan */}
+        {plan && planSummary && (
+          <div className="bg-white border border-indigo-200 rounded-2xl p-4 mt-4 mb-2">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex-1">
+                <div className="font-bold text-sm text-gray-900">My Learning Plan</div>
+                <div className="text-[10px] text-gray-400">
+                  {planSummary.met} of {planSummary.goals} goals met &middot;{' '}
+                  {planSummary.modulesMastered}/{planSummary.modulesAssigned} modules mastered
+                </div>
+              </div>
+              <button onClick={onPlan} className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">
+                View
+              </button>
+            </div>
+            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+              <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${planSummary.averageGrowth}%` }} />
+            </div>
+            {upNext.length > 0 && (
+              <>
+                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">Up next</div>
+                <div className="space-y-1">
+                  {upNext.slice(0, 3).map(a => {
+                    const mod = getModule(a.moduleId);
+                    return (
+                      <div key={a.id} className="flex items-center gap-2 text-[11px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" aria-hidden />
+                        <span className="text-gray-700 truncate flex-1">{mod?.title ?? a.moduleId}</span>
+                        <span className="text-gray-400 flex-shrink-0">{mod?.minutes ?? 0} min</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Knowledge Gaps Alert */}
         {gaps.length > 0 && (
           <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl p-4 mt-4 mb-2">
