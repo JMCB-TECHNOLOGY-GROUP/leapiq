@@ -158,7 +158,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
               onClick={() => onOpenPlan(selectedStudent)}
               className="w-full bg-white border border-indigo-200 rounded-2xl p-3 mb-4 flex items-center gap-3 hover:border-indigo-400"
             >
-              <span className="text-xl" aria-hidden>&#128203;</span>
+              <span className="text-xl" aria-hidden>📋</span>
               <div className="text-left">
                 <div className="font-semibold text-sm text-gray-900">Open learning plan</div>
                 <div className="text-gray-400 text-[11px]">Goals, baselines and assigned modules</div>
@@ -207,7 +207,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
       <div className="px-5 -mt-3">
         {/* Quick actions */}
         <button onClick={onIntake} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-3.5 mt-3 flex items-center gap-3 shadow-lg shadow-indigo-500/20 active:scale-98">
-          <span className="text-xl" aria-hidden>&#128200;</span>
+          <span className="text-xl" aria-hidden>📈</span>
           <div className="text-left">
             <div className="font-bold text-sm">Assessment Intake</div>
             <div className="text-white/70 text-[11px]">Import scores, set baselines, build plans</div>
@@ -216,7 +216,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
         </button>
 
         <button onClick={() => setView('materials')} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 flex items-center gap-3 active:scale-98 hover:border-indigo-300">
-          <span className="text-xl" aria-hidden>&#128218;</span>
+          <span className="text-xl" aria-hidden>📚</span>
           <div className="text-left">
             <div className="font-semibold text-sm text-gray-900">Class Materials</div>
             <div className="text-gray-400 text-[11px]">Modules pre-loaded for every grade</div>
@@ -225,7 +225,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
         </button>
 
         <button onClick={() => setView('standards')} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 flex items-center gap-3 active:scale-98 hover:border-indigo-300">
-          <span className="text-xl">&#128203;</span>
+          <span className="text-xl">📋</span>
           <div className="text-left">
             <div className="font-semibold text-sm text-gray-900">Standards Alignment</div>
             <div className="text-gray-400 text-[11px]">Mastery by curriculum strand</div>
@@ -256,7 +256,7 @@ export default function EducatorDashboard({ onLogout, onIntake, onOpenPlan }: {
                   <div className="text-[10px] text-gray-400">
                     {GRADE_CONFIG[s.grade]?.label} &middot; {s.sessions} sessions &middot;
                     <span className={`font-bold ml-1 ${s.velocity.trend === 'improving' ? 'text-green-600' : s.velocity.trend === 'declining' ? 'text-red-500' : 'text-gray-500'}`}>
-                      {s.velocity.trend === 'improving' ? '&#8593;' : s.velocity.trend === 'declining' ? '&#8595;' : '&#8594;'}
+                      {s.velocity.trend === 'improving' ? '↑' : s.velocity.trend === 'declining' ? '↓' : '→'}
                     </span>
                   </div>
                 </div>

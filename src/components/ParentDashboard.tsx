@@ -106,7 +106,7 @@ export default function ParentDashboard({ onLogout }: { onLogout: () => void }) 
                       {/* Velocity indicator */}
                       <div className="flex items-center gap-2 text-xs">
                         <span className={`font-bold ${velocity.trend === 'improving' ? 'text-green-600' : velocity.trend === 'declining' ? 'text-red-500' : 'text-gray-500'}`}>
-                          {velocity.trend === 'improving' ? '&#8593; Improving' : velocity.trend === 'declining' ? '&#8595; Needs attention' : '&#8594; Steady'}
+                          {velocity.trend === 'improving' ? '↑ Improving' : velocity.trend === 'declining' ? '↓ Needs attention' : '→ Steady'}
                         </span>
                         <span className="text-gray-400">&middot; {velocity.daily} sessions/day avg</span>
                       </div>
@@ -168,7 +168,7 @@ export default function ParentDashboard({ onLogout }: { onLogout: () => void }) 
                             onClick={() => analyzeGaps(s.id, s.name, s.grade)}
                             className="w-full py-2 bg-indigo-50 text-indigo-600 rounded-xl text-xs font-bold active:scale-95"
                           >
-                            &#129302; AI Gap Analysis
+                            🤖 AI Gap Analysis
                           </button>
                         ) : analysis.loading ? (
                           <div className="text-center py-2 text-xs text-gray-400">Analyzing...</div>
@@ -182,7 +182,7 @@ export default function ParentDashboard({ onLogout }: { onLogout: () => void }) 
 
                       {/* View charts button */}
                       <button onClick={() => setShowCharts(s.id)} className="w-full py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold active:scale-95">
-                        &#128200; View Progress Charts
+                        📈 View Progress Charts
                       </button>
 
                       {/* Recent sessions */}

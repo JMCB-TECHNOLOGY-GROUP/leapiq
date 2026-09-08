@@ -8,7 +8,15 @@ export default function Landing({ onStudent, onParent, onEducator }: {
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center p-6 overflow-hidden">
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&q=80&auto=format" alt="Students learning" className="w-full h-full object-cover" />
+        <img
+          src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1280&q=70&auto=format"
+          alt=""
+          aria-hidden="true"
+          width={1280}
+          height={853}
+          decoding="async"
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
       </div>
       <div className="relative z-10 text-center max-w-md w-full">

@@ -27,7 +27,7 @@ export default function ParentLogin({ onSuccess, onBack }: {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center p-6">
       <button onClick={onBack} className="absolute top-6 left-6 text-gray-400 text-sm">&larr; Back</button>
       <div className="max-w-xs w-full text-center">
-        <div className="text-5xl mb-4">&#128274;</div>
+        <div className="text-5xl mb-4">🔒</div>
         <h1 className="text-2xl font-black text-gray-900 mb-2">{isCreate ? 'Create PIN' : 'Parent Login'}</h1>
         <p className="text-gray-400 mb-6 text-sm">{isCreate ? 'Set a PIN to protect the parent dashboard' : 'Enter your PIN'}</p>
         <input

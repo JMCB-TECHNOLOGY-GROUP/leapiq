@@ -92,7 +92,7 @@ export default function Quiz({ subject, onDone, onBack }: {
           <div className="absolute inset-0 bg-gradient-to-b from-blue-700/85 to-indigo-800/90" />
         </div>
         <div className="relative z-10 text-center">
-          <div className="text-6xl mb-4">{pct >= 80 ? '&#127942;' : pct >= 60 ? '&#11088;' : '&#128170;'}</div>
+          <div className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 60 ? '⭐' : '💪'}</div>
           <div className="text-5xl font-black mb-2">{pct}%</div>
           <p className="text-white/70 mb-1">{correct} of {questions.length} correct</p>
           <p className="text-amber-300 font-bold mb-6">+{xp} XP earned</p>
@@ -175,8 +175,8 @@ export default function Quiz({ subject, onDone, onBack }: {
           <span className="text-[10px] text-gray-400 font-bold">{cur + 1}/{questions.length}</span>
         </div>
         <div className="flex items-center gap-3 text-[11px]">
-          <span className="text-amber-500 font-bold">&#9889; {xp} XP</span>
-          {streak >= 2 && <span className="text-orange-500 font-bold">&#128293; {streak} streak!</span>}
+          <span className="text-amber-500 font-bold">⚡ {xp} XP</span>
+          {streak >= 2 && <span className="text-orange-500 font-bold">🔥 {streak} streak!</span>}
           <span className={`ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold ${
             q.bl === 'remember' ? 'bg-green-100 text-green-700'
             : q.bl === 'understand' ? 'bg-blue-100 text-blue-700'

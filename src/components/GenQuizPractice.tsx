@@ -17,7 +17,7 @@ export default function GenQuizPractice({ questions, onBack }: {
     return (
       <div className="min-h-screen relative flex flex-col items-center justify-center p-6 text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-600 to-purple-700" />
-        <div className="relative z-10 text-5xl mb-3">{pct >= 80 ? '&#127942;' : pct >= 60 ? '&#11088;' : '&#128170;'}</div>
+        <div className="relative z-10 text-5xl mb-3">{pct >= 80 ? '🏆' : pct >= 60 ? '⭐' : '💪'}</div>
         <div className="relative z-10 text-4xl font-black mb-1">{pct}%</div>
         <p className="relative z-10 text-white/70 mb-6">{score} of {questions.length} correct</p>
         <button onClick={onBack} className="relative z-10 bg-white/20 text-white font-bold py-3 px-8 rounded-xl active:scale-95">Done</button>
@@ -33,7 +33,7 @@ export default function GenQuizPractice({ questions, onBack }: {
     <div className="min-h-screen bg-white flex flex-col">
       <div className="p-4 bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center gap-3">
         <button onClick={onBack} className="text-white/80">&times;</button>
-        <span className="text-white font-bold text-sm flex-1">&#128196; From Your Materials</span>
+        <span className="text-white font-bold text-sm flex-1">📄 From Your Materials</span>
         <span className="text-white/60 text-xs">{cur + 1}/{questions.length}</span>
       </div>
       <div className="flex-1 p-5 overflow-y-auto">

@@ -123,7 +123,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
         {/* Review Due */}
         {dueCount > 0 && (
           <button onClick={onReview} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl p-4 mt-3 mb-2 flex items-center gap-3 active:scale-95 transition-transform shadow-lg shadow-orange-500/20">
-            <span className="text-2xl animate-pulse-gentle">&#128260;</span>
+            <span className="text-2xl animate-pulse-gentle">🔄</span>
             <div className="text-left">
               <div className="font-bold text-sm">{dueCount} questions due for review</div>
               <div className="text-white/70 text-xs">Spaced repetition keeps it in your brain</div>
@@ -133,7 +133,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
 
         {/* Upload Documents */}
         <button onClick={onUpload} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 mb-1 flex items-center gap-3 active:scale-98 transition-transform hover:border-blue-300">
-          <span className="text-xl">&#128196;</span>
+          <span className="text-xl">📄</span>
           <div className="text-left">
             <div className="font-semibold text-sm text-gray-900">Upload Study Materials</div>
             <div className="text-gray-400 text-[11px]">Tests, worksheets, study guides</div>
@@ -158,10 +158,10 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
                 </div>
                 <div className="p-2.5 space-y-1.5">
                   <button onClick={() => onQuiz(s.id)} className={`w-full py-2 ${s.bg} ${s.tx} font-bold rounded-xl text-xs active:scale-95 transition-transform`}>
-                    &#128221; Quiz
+                    📝 Quiz
                   </button>
                   <button onClick={() => onTutor(s.id)} className={`w-full py-2 border ${s.bd} ${s.tx} font-bold rounded-xl text-xs active:scale-95 transition-transform`}>
-                    &#129302; AI Tutor
+                    🤖 AI Tutor
                   </button>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default function StudentDashboard({ onQuiz, onTutor, onReview, onUpload, 
               const subj = SUBJECTS.find(x => x.id === s.subject);
               return (
                 <div key={i} className="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3 mb-2">
-                  <span className="text-lg">{subj?.icon || '&#128218;'}</span>
+                  <span className="text-lg">{subj?.icon || '📚'}</span>
                   <div className="flex-1">
                     <div className="font-bold text-xs text-gray-900">{subj?.name} Quiz</div>
                     <div className="text-[10px] text-gray-400">{new Date(s.date).toLocaleDateString()}</div>

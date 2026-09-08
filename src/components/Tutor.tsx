@@ -66,7 +66,7 @@ export default function Tutor({ subject, onBack }: {
       {/* Header */}
       <div className={`bg-gradient-to-r ${subj?.gradient} px-4 py-3 flex items-center gap-3`}>
         <button onClick={onBack} className="text-white/80">&larr;</button>
-        <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">&#129302;</div>
+        <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
         <div>
           <div className="text-white font-bold text-sm">{subj?.name} Tutor</div>
           <div className="text-white/50 text-[10px]">Ask me anything</div>

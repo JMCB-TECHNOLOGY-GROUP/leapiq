@@ -111,7 +111,7 @@ export default function ProgressCharts({ sessions, studentId }: {
   if (sessions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-4xl mb-3">&#128202;</div>
+        <div className="text-4xl mb-3">📊</div>
         <p className="text-gray-500 font-semibold">No data yet</p>
         <p className="text-gray-400 text-sm">Complete some quizzes to see analytics!</p>
       </div>
