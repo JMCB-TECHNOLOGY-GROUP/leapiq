@@ -49,8 +49,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     assignments: [],
   });
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount.
+  // localStorage does not exist on the server and must not be read during
+  // render, so hydrating the store after mount is the only correct option here.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount hydration from localStorage
     setState({
       user: storage.getUser(),
       students: storage.getStudents(),

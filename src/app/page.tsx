@@ -21,14 +21,17 @@ export default function Home() {
   const [screen, setScreen] = useState('landing');
   const [restored, setRestored] = useState(false);
 
-  // Auto-restore session on mount
+  // Auto-restore session on mount. The persisted user arrives after the
+  // provider hydrates, so the screen cannot be derived on the first render.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- screen restore depends on the post-mount user */
     if (!restored && user) {
       if (user.role === 'student') setScreen('dashboard');
       else if (user.role === 'parent') setScreen('par-dash');
       else if (user.role === 'educator') setScreen('edu-dash');
       setRestored(true);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [user, restored]);
 
   // Landing

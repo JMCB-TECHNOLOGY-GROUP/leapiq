@@ -20,7 +20,10 @@ export default function Tutor({ subject, onBack }: {
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // The greeting names the pupil, who is only known after the provider has
+  // hydrated from localStorage, so this cannot come from lazy initial state.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- greeting depends on post-mount user
     setMsgs([{
       role: 'assistant',
       content: `Hey ${name}! I'm your ${subj?.name} tutor.\n\nAsk me anything! For example:\n• "Explain fractions like I'm 10"\n• "Why did the Aztecs fall?"\n• "Help me with photosynthesis"\n• "Quiz me on grammar"\n\nWhat do you want to work on?`
